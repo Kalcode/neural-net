@@ -1,6 +1,7 @@
 import { runXORExample } from '../examples/xor';
 import { runANDExample } from '../examples/and';
 import { runORExample } from '../examples/or';
+import { runNANDExample } from '../examples/nand';
 
 console.log("Running XOR Example:");
 runXORExample();
@@ -14,3 +15,8 @@ console.log("\n----------------------------\n");
 
 console.log("Running OR Example:");
 runORExample();
+
+console.log("\n----------------------------\n");
+
+console.log("Running NAND Example:");
+runNANDExample();
