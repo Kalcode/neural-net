@@ -6,11 +6,21 @@ export class Layer {
     public neurons: Neuron[];
     private prevWeightDeltas: BigNumber[][];
     private prevBiasDeltas: BigNumber[];
+    private invalidErrorCount: number;
 
     constructor(inputSize: number, outputSize: number) {
         this.neurons = Array.from({ length: outputSize }, () => new Neuron(inputSize));
         this.prevWeightDeltas = Array.from({ length: outputSize }, () => Array(inputSize).fill(toBigNumber(0)));
         this.prevBiasDeltas = Array(outputSize).fill(toBigNumber(0));
+        this.invalidErrorCount = 0;
+    }
+
+    getInvalidErrorCount(): number {
+        return this.invalidErrorCount;
+    }
+
+    resetInvalidErrorCount(): void {
+        this.invalidErrorCount = 0;
     }
 
     forward(inputs: BigNumber[]): BigNumber[] {
@@ -29,6 +39,7 @@ export class Layer {
             }
             if (!isValidNumber(errors[i])) {
                 console.error(`Invalid error for neuron ${i}: ${errors[i]}`);
+                this.invalidErrorCount++;
                 return;
             }
             
