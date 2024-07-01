@@ -62,6 +62,9 @@ export class Network {
                         weights: neuron.weights,
                         bias: neuron.bias
                     }))));
+                    console.error('Layer sizes:', this.layers.map(layer => layer.neurons.length));
+                    console.error('Input size:', inputs[i].length);
+                    console.error('Target size:', targets[i].length);
                     return; // Stop training if an error occurs
                 }
             }
@@ -70,7 +73,9 @@ export class Network {
                 console.error(`Invalid average error: ${averageError}`);
                 return; // Stop training if average error is invalid
             }
-            console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}`);
+            if (epoch % 100 === 0 || epoch === epochs - 1) {
+                console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}`);
+            }
         }
     }
 }
