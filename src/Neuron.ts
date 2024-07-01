@@ -44,19 +44,21 @@ export class Neuron {
         return this.lastOutput;
     }
 
-    updateWeights(error: number, learningRate: number): void {
+    updateWeights(error: number, learningRate: number): number[] {
         if (!isValidNumber(error) || !isValidNumber(learningRate)) {
             throw new Error(`Invalid error or learning rate: error=${error}, learningRate=${learningRate}`);
         }
 
         const delta = this.clipGradient(error * this.sigmoidDerivative(this.lastOutput));
-        this.weights = this.weights.map((weight, i) => {
+        const deltas = this.weights.map((weight, i) => {
             const update = round(learningRate * delta * this.lastInputs[i]);
             if (!isValidNumber(update)) {
                 throw new Error(`Invalid weight update: update=${update}, weight=${weight}, input=${this.lastInputs[i]}`);
             }
-            return round(weight + update);
+            this.weights[i] = round(weight + update);
+            return delta * weight;
         });
         this.bias = round(this.bias + learningRate * delta);
+        return deltas;
     }
 }
