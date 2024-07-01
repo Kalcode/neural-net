@@ -29,32 +29,41 @@ export class Network {
     train(inputs: number[][], targets: number[][], epochs: number, learningRate: number): void {
         for (let epoch = 0; epoch < epochs; epoch++) {
             let totalError = 0;
+            let validSamples = 0;
             for (let i = 0; i < inputs.length; i++) {
                 const output = this.forward(inputs[i]);
                 if (output.some(val => !isValidNumber(val))) {
                     console.error(`Invalid output at epoch ${epoch}, input ${i}:`, inputs[i], "Output:", output);
-                    return;
+                    continue;
                 }
-                const errors = targets[i].map((t, j) => t - output[j]);
+                const errors = targets[i].map((t, j) => {
+                    const err = t - output[j];
+                    return isValidNumber(err) ? err : 0;
+                });
                 const squaredErrors = errors.map(err => err * err);
                 if (squaredErrors.some(val => !isValidNumber(val))) {
                     console.error(`Invalid squared errors at epoch ${epoch}, input ${i}:`, squaredErrors);
-                    return;
+                    continue;
                 }
                 totalError += squaredErrors.reduce((sum, err) => sum + err, 0) / errors.length;
+                validSamples++;
 
                 for (let j = this.layers.length - 1; j >= 0; j--) {
                     const layerInputs = j === 0 ? inputs[i] : this.layers[j-1].forward(inputs[i]);
                     this.layers[j].train(errors, learningRate, layerInputs);
                 }
             }
-            const averageError = totalError / inputs.length;
+            if (validSamples === 0) {
+                console.error(`No valid samples in epoch ${epoch}`);
+                continue;
+            }
+            const averageError = totalError / validSamples;
             if (!isValidNumber(averageError)) {
                 console.error(`Invalid average error at epoch ${epoch}: ${averageError}`);
-                return;
+                continue;
             }
             if (epoch % 100 === 0 || epoch === epochs - 1) {
-                console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}`);
+                console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}, Valid Samples: ${validSamples}/${inputs.length}`);
             }
         }
     }
