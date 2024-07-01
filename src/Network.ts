@@ -37,10 +37,13 @@ export class Network {
                     
                     let layerErrors = errors;
                     for (let j = this.layers.length - 1; j >= 0; j--) {
+                        console.log(`Before backpropagation - Layer ${j}, Errors:`, layerErrors);
                         layerErrors = this.layers[j].backpropagate(layerErrors, learningRate);
+                        console.log(`After backpropagation - Layer ${j}, New Errors:`, layerErrors);
                     }
                 } catch (error) {
                     console.error(`Error in epoch ${epoch + 1}, input ${i}:`, error);
+                    console.error('Current state:', { inputs: inputs[i], output, errors, layerErrors });
                     return; // Stop training if an error occurs
                 }
             }
