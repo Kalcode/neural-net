@@ -19,7 +19,7 @@ const targets = [
 // Create a XOR network
 const inputSize = inputs[0].length;
 const outputSize = targets[0].length;
-const hiddenSizes = [inputSize * 2, outputSize];
+const hiddenSizes = [inputSize, outputSize];
 const xorNetwork = new Network(inputSize, hiddenSizes, outputSize);
 
 
