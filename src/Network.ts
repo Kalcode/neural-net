@@ -34,16 +34,23 @@ export class Network {
                 const output = this.forward(inputs[i]);
                 if (output.some(val => !isValidNumber(val))) {
                     console.error(`Invalid output at epoch ${epoch}, input ${i}:`, inputs[i], "Output:", output);
-                    continue;
+                    return; // Stop early
                 }
                 const errors = targets[i].map((t, j) => {
                     const err = t - output[j];
-                    return isValidNumber(err) ? err : 0;
+                    if (!isValidNumber(err)) {
+                        console.error(`Invalid error at epoch ${epoch}, input ${i}, output ${j}: ${err}`);
+                        return 0; // Use 0 as a default, but we'll stop training anyway
+                    }
+                    return err;
                 });
+                if (errors.some(err => err === 0)) {
+                    return; // Stop early if we encountered any invalid errors
+                }
                 const squaredErrors = errors.map(err => err * err);
                 if (squaredErrors.some(val => !isValidNumber(val))) {
                     console.error(`Invalid squared errors at epoch ${epoch}, input ${i}:`, squaredErrors);
-                    continue;
+                    return; // Stop early
                 }
                 totalError += squaredErrors.reduce((sum, err) => sum + err, 0) / errors.length;
                 validSamples++;
@@ -55,12 +62,12 @@ export class Network {
             }
             if (validSamples === 0) {
                 console.error(`No valid samples in epoch ${epoch}`);
-                continue;
+                return; // Stop early
             }
             const averageError = totalError / validSamples;
             if (!isValidNumber(averageError)) {
                 console.error(`Invalid average error at epoch ${epoch}: ${averageError}`);
-                continue;
+                return; // Stop early
             }
             if (epoch % 100 === 0 || epoch === epochs - 1) {
                 console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}, Valid Samples: ${validSamples}/${inputs.length}`);
