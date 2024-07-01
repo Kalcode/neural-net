@@ -18,12 +18,28 @@ export class Layer {
     }
 
     train(errors: BigNumber[], learningRate: BigNumber, inputs: BigNumber[], momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
+        if (errors.length !== this.neurons.length) {
+            console.error(`Mismatch between errors length (${errors.length}) and neurons length (${this.neurons.length})`);
+            return;
+        }
+
         this.neurons.forEach((neuron, i) => {
-            if (!errors[i] || !isValidNumber(errors[i])) {
+            if (!isValidNumber(errors[i])) {
                 console.error(`Invalid error for neuron ${i}: ${errors[i]}`);
                 return;
             }
+            
+            if (inputs.some(input => !isValidNumber(input))) {
+                console.error(`Invalid inputs for neuron ${i}: ${inputs}`);
+                return;
+            }
+
             const { weightDeltas, biasDelta } = neuron.calculateGradients(errors[i], inputs);
+
+            if (weightDeltas.some(delta => !isValidNumber(delta)) || !isValidNumber(biasDelta)) {
+                console.error(`Invalid gradients for neuron ${i}: weightDeltas=${weightDeltas}, biasDelta=${biasDelta}`);
+                return;
+            }
             
             // Apply momentum
             const newWeightDeltas = weightDeltas.map((delta, j) => delta.plus(momentum.times(this.prevWeightDeltas[i][j])));

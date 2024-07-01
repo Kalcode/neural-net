@@ -47,6 +47,11 @@ export class Network {
                 }
 
                 const errors = targets[i].map((t, j) => {
+                    if (!isValidNumber(t) || !isValidNumber(output[j])) {
+                        console.error(`Invalid target or output at epoch ${epoch}, input ${i}, output ${j}: target=${t}, output=${output[j]}`);
+                        epochValid = false;
+                        return toBigNumber(0);
+                    }
                     const err = toBigNumber(t).minus(output[j]);
                     if (!isValidNumber(err)) {
                         console.error(`Invalid error at epoch ${epoch}, input ${i}, output ${j}: ${err.toString()}`);
@@ -57,6 +62,12 @@ export class Network {
                 });
 
                 if (!epochValid) break;
+
+                if (errors.length !== this.layers[this.layers.length - 1].neurons.length) {
+                    console.error(`Mismatch between errors length (${errors.length}) and output layer neurons (${this.layers[this.layers.length - 1].neurons.length})`);
+                    epochValid = false;
+                    break;
+                }
 
                 const squaredErrors = errors.map(err => err.pow(2));
                 if (squaredErrors.some(val => !isValidNumber(val))) {
