@@ -8,5 +8,8 @@
   "devDependencies": {
     "@types/bun": "^1.1.6",
     "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "bignumber.js": "^9.1.2"
   }
 }
