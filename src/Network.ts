@@ -46,11 +46,6 @@ export class Network {
                     break;
                 }
 
-                console.log(`Epoch ${epoch}, Input ${i}:`);
-                console.log(`Input:`, inputs[i]);
-                console.log(`Output:`, output);
-                console.log(`Target:`, targets[i]);
-
                 const errors = targets[i].map((t, j) => {
                     const err = toBigNumber(t).minus(output[j]);
                     if (!isValidNumber(err)) {
@@ -58,13 +53,10 @@ export class Network {
                         epochValid = false;
                         return toBigNumber(0);
                     }
-                    console.log(`Error for output ${j}: ${err.toString()}`);
                     return err;
                 });
 
                 if (!epochValid) break;
-
-                console.log(`Errors:`, errors);
 
                 const squaredErrors = errors.map(err => err.pow(2));
                 if (squaredErrors.some(val => !isValidNumber(val))) {
@@ -78,8 +70,6 @@ export class Network {
 
                 for (let j = this.layers.length - 1; j >= 0; j--) {
                     const layerInputs = j === 0 ? inputs[i] : this.layers[j-1].forward(inputs[i]);
-                    console.log(`Training layer ${j}:`);
-                    console.log(`Layer inputs:`, layerInputs);
                     this.layers[j].train(errors, learningRate, layerInputs, momentum, batchSize, maxGradientNorm);
                 }
             }
@@ -109,9 +99,6 @@ export class Network {
                 epochsSinceImprovement = epochsSinceImprovement.plus(1);
             }
 
-            if (epoch % 100 === 0 || epoch === epochs - 1) {
-                console.log(`Epoch ${epoch + 1}, Average Error: ${averageError.toString()}, Valid Samples: ${validSamples.toString()}/${inputs.length}`);
-            }
 
             // Early stopping condition
             if (epochsSinceImprovement.isGreaterThanOrEqualTo(1000)) {

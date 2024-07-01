@@ -18,16 +18,7 @@ export class Layer {
     }
 
     train(errors: BigNumber[], learningRate: BigNumber, inputs: BigNumber[], momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
-        console.log(`Layer training:`);
-        console.log(`Errors:`, errors.map(e => e ? e.toString() : 'undefined'));
-        console.log(`Learning rate:`, learningRate.toString());
-        console.log(`Inputs:`, inputs.map(i => i.toString()));
-        console.log(`Batch size:`, batchSize.toString());
-        console.log(`Momentum:`, momentum.toString());
-        console.log(`Max gradient norm:`, maxGradientNorm.toString());
-
         this.neurons.forEach((neuron, i) => {
-            console.log(`Training neuron ${i}:`);
             if (!errors[i] || !isValidNumber(errors[i])) {
                 console.error(`Invalid error for neuron ${i}: ${errors[i]}`);
                 return;
