@@ -21,13 +21,18 @@ export class Neuron {
     private sigmoid(x: BigNumber): BigNumber {
         if (x.isLessThan(-709)) return toBigNumber(0);
         if (x.isGreaterThan(709)) return toBigNumber(1);
-        const exp = Math.exp(x.negated().toNumber());
-        const result = toBigNumber(1).dividedBy(toBigNumber(1).plus(toBigNumber(exp)));
-        if (!isValidNumber(result)) {
-            console.error(`Invalid sigmoid result: ${result.toString()} for input ${x.toString()}`);
+        try {
+            const exp = toBigNumber(Math.exp(x.negated().toNumber()));
+            const result = toBigNumber(1).dividedBy(toBigNumber(1).plus(exp));
+            if (!isValidNumber(result)) {
+                console.error(`Invalid sigmoid result: ${result.toString()} for input ${x.toString()}`);
+                return toBigNumber(0.5); // Default to middle of sigmoid range
+            }
+            return result;
+        } catch (error) {
+            console.error(`Error in sigmoid function: ${error}`);
             return toBigNumber(0.5); // Default to middle of sigmoid range
         }
-        return result;
     }
 
     private batchNormalize(x: BigNumber): BigNumber {
@@ -40,22 +45,27 @@ export class Neuron {
             throw new Error("Input size does not match weight size");
         }
 
-        const weightedSum = inputs.reduce((sum, input, i) => {
-            const product = input.times(this.weights[i]);
-            if (!isValidNumber(product)) {
-                console.error(`Invalid product: ${input.toString()} * ${this.weights[i].toString()} = ${product.toString()}`);
-                return sum;
-            }
-            return sum.plus(product);
-        }, toBigNumber(0)).plus(this.bias);
+        try {
+            const weightedSum = inputs.reduce((sum, input, i) => {
+                const product = input.times(this.weights[i]);
+                if (!isValidNumber(product)) {
+                    console.error(`Invalid product: ${input.toString()} * ${this.weights[i].toString()} = ${product.toString()}`);
+                    return sum;
+                }
+                return sum.plus(product);
+            }, toBigNumber(0)).plus(this.bias);
 
-        if (!isValidNumber(weightedSum)) {
-            console.error(`Invalid weighted sum: ${weightedSum.toString()}`);
+            if (!isValidNumber(weightedSum)) {
+                console.error(`Invalid weighted sum: ${weightedSum.toString()}`);
+                return toBigNumber(0.5); // Default to middle of output range
+            }
+
+            const normalized = this.batchNormalize(weightedSum);
+            return this.sigmoid(normalized);
+        } catch (error) {
+            console.error(`Error in forward pass: ${error}`);
             return toBigNumber(0.5); // Default to middle of output range
         }
-
-        const normalized = this.batchNormalize(weightedSum);
-        return this.sigmoid(normalized);
     }
 
     calculateGradients(error: BigNumber, inputs: BigNumber[]): { weightDeltas: BigNumber[], biasDelta: BigNumber } {
@@ -64,20 +74,28 @@ export class Neuron {
             return { weightDeltas: this.weights.map(() => toBigNumber(0)), biasDelta: toBigNumber(0) };
         }
 
-        const output = this.forward(inputs);
-        
-        // Add a small constant to prevent division by zero
-        const delta = error.times(output).times(toBigNumber(1).minus(output).plus(toBigNumber(1e-7)));
+        try {
+            const output = this.forward(inputs);
+            
+            // Add a small constant to prevent division by zero
+            const delta = error.times(output).times(toBigNumber(1).minus(output).plus(toBigNumber(1e-7)));
 
-        if (!isValidNumber(delta)) {
-            console.error(`Invalid delta: ${delta.toString()}, error: ${error.toString()}, output: ${output.toString()}`);
+            if (!isValidNumber(delta)) {
+                console.error(`Invalid delta: ${delta.toString()}, error: ${error.toString()}, output: ${output.toString()}`);
+                return { weightDeltas: this.weights.map(() => toBigNumber(0)), biasDelta: toBigNumber(0) };
+            }
+
+            const weightDeltas = this.weights.map((_, i) => {
+                const wd = delta.times(inputs[i]);
+                return isValidNumber(wd) ? wd : toBigNumber(0);
+            });
+            const biasDelta = delta;
+
+            return { weightDeltas, biasDelta };
+        } catch (error) {
+            console.error(`Error in calculateGradients: ${error}`);
             return { weightDeltas: this.weights.map(() => toBigNumber(0)), biasDelta: toBigNumber(0) };
         }
-
-        const weightDeltas = this.weights.map((_, i) => delta.times(inputs[i]));
-        const biasDelta = delta;
-
-        return { weightDeltas, biasDelta };
     }
 
     applyGradients(weightDeltas: BigNumber[], biasDelta: BigNumber, learningRate: BigNumber): void {
