@@ -21,7 +21,7 @@ export class Neuron {
     private sigmoid(x: BigNumber): BigNumber {
         if (x.isLessThan(-709)) return toBigNumber(0);
         if (x.isGreaterThan(709)) return toBigNumber(1);
-        const result = toBigNumber(1).dividedBy(toBigNumber(1).plus(x.negated().exp()));
+        const result = toBigNumber(1).dividedBy(toBigNumber(1).plus(toBigNumber(Math.E).exponentiatedBy(x.negated())));
         if (!isValidNumber(result)) {
             console.error(`Invalid sigmoid result: ${result.toString()} for input ${x.toString()}`);
             return toBigNumber(0.5); // Default to middle of sigmoid range
