@@ -17,8 +17,10 @@ The implementation consists of a `NeuralNetwork` class that creates a feedforwar
 - Input layer: 2 nodes
 - Hidden layer: 
   - 4 nodes for XOR
-  - 3 nodes for AND
+  - 3 nodes for AND and OR
 - Output layer: 1 node
+
+Note: The number of hidden nodes can be adjusted based on the complexity of the problem.
 
 ## Key Components
 

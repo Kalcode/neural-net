@@ -20,12 +20,12 @@ export class NeuralNetwork {
      * @param outputNodes Number of output nodes
      * @param learningRate Learning rate for weight updates (default: 0.1)
      */
-    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, learningRate: number = 0.1) {
-        this.inputNodes = inputNodes;
-        this.hiddenNodes = hiddenNodes;
-        this.outputNodes = outputNodes;
-        this.learningRate = learningRate;
-
+    constructor(
+        private inputNodes: number,
+        private hiddenNodes: number,
+        private outputNodes: number,
+        private learningRate: number = 0.1
+    ) {
         // Initialize weights and biases with random values
         this.weightsIH = this.initializeWeights(this.hiddenNodes, this.inputNodes);
         this.weightsHO = this.initializeWeights(this.outputNodes, this.hiddenNodes);
@@ -88,15 +88,13 @@ export class NeuralNetwork {
      * @returns Object containing hidden layer and output layer activations
      */
     forward(input: number[]): { hidden: number[], output: number[] } {
-        // Calculate hidden layer
-        const hidden = this.weightsIH.map((weights, i) =>
-            this.sigmoid(this.dotProduct(weights, input) + this.biasH[i])
-        );
+        const calculateLayer = (weights: number[][], inputs: number[], biases: number[]): number[] =>
+            weights.map((nodeWeights, i) =>
+                this.sigmoid(this.dotProduct(nodeWeights, inputs) + biases[i])
+            );
 
-        // Calculate output layer
-        const output = this.weightsHO.map((weights, i) =>
-            this.sigmoid(this.dotProduct(weights, hidden) + this.biasO[i])
-        );
+        const hidden = calculateLayer(this.weightsIH, input, this.biasH);
+        const output = calculateLayer(this.weightsHO, hidden, this.biasO);
 
         return { hidden, output };
     }

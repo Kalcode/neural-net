@@ -14,17 +14,16 @@ export function runXORExample() {
     const epochs = 10000;
 
     console.log("Training the neural network for XOR function...");
+    const logInterval = 1000;
     for (let i = 0; i < epochs; i++) {
-        trainingData.forEach(data => {
-            nn.train(data.input, data.target);
-        });
+        trainingData.forEach(data => nn.train(data.input, data.target));
 
-        if (i % 1000 === 0) {
+        if (i % logInterval === 0) {
             const mse = trainingData.reduce((sum, data) => {
                 const { output } = nn.forward(data.input);
                 return sum + nn.meanSquaredError(output, data.target);
             }, 0) / trainingData.length;
-            console.log(`Epoch ${i}: MSE = ${mse}`);
+            console.log(`Epoch ${i}: MSE = ${mse.toFixed(6)}`);
         }
     }
 
