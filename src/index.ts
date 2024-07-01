@@ -23,7 +23,7 @@ const targets = [
 
 // Train the network
 console.log("Training the network...");
-const epochs = 10000;
+const epochs = 1000;
 const learningRate = toBigNumber(0.1);
 const momentum = toBigNumber(0.9);
 const batchSize = toBigNumber(1);
