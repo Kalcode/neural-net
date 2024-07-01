@@ -18,7 +18,7 @@ const targets = [
 
 // Create a XOR network
 const inputSize = inputs[0].length;
-const hiddenSizes = [2];  
+const hiddenSizes = [inputSize, outputSize];
 const outputSize = 1;
 const xorNetwork = new Network(inputSize, hiddenSizes, outputSize);
 
@@ -27,9 +27,9 @@ const xorNetwork = new Network(inputSize, hiddenSizes, outputSize);
 // Train the network
 console.log("Training the network...");
 const epochs = 1000;
-const learningRate = 0.1;
+const learningRate = 0.01;
 const momentum = 0.9;
-const batchSize = 1;
+const batchSize = inputs.length;
 const maxGradientNorm = 1;
 
 xorNetwork.train(inputs, targets, epochs, learningRate, momentum, batchSize, maxGradientNorm);
