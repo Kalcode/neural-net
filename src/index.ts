@@ -1,5 +1,7 @@
 import { Layer } from './Layer';
 
+// Examples
+console.log("\nExamples:");
 // Create a simple XOR network
 // Input layer: 2 neurons (for 2 inputs)
 // Hidden layer: 2 neurons
