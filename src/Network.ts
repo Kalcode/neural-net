@@ -5,10 +5,21 @@ export class Network {
     private layers: Layer[];
 
     constructor(layerSizes: number[]) {
+        if (layerSizes.length < 2) {
+            throw new Error("Network must have at least input and output layers");
+        }
         this.layers = [];
         for (let i = 1; i < layerSizes.length; i++) {
             this.layers.push(new Layer(layerSizes[i-1], layerSizes[i]));
         }
+    }
+
+    get inputSize(): number {
+        return this.layers[0].neurons[0].weights.length;
+    }
+
+    get outputSize(): number {
+        return this.layers[this.layers.length - 1].neurons.length;
     }
 
     forward(inputs: number[]): number[] {
@@ -28,6 +39,16 @@ export class Network {
     }
 
     train(inputs: number[][], targets: number[][], epochs: number, learningRate: number): void {
+        if (inputs.length !== targets.length) {
+            throw new Error("Number of input samples must match number of target samples");
+        }
+        if (inputs[0].length !== this.inputSize) {
+            throw new Error(`Input size mismatch. Expected ${this.inputSize}, got ${inputs[0].length}`);
+        }
+        if (targets[0].length !== this.outputSize) {
+            throw new Error(`Output size mismatch. Expected ${this.outputSize}, got ${targets[0].length}`);
+        }
+
         for (let epoch = 0; epoch < epochs; epoch++) {
             let totalError = 0;
             for (let i = 0; i < inputs.length; i++) {
@@ -46,13 +67,7 @@ export class Network {
                     
                     layerErrors = errors;
                     for (let j = this.layers.length - 1; j >= 0; j--) {
-                        if (layerErrors.some(err => !isValidNumber(err))) {
-                            throw new Error(`Invalid errors before backpropagation: ${layerErrors}`);
-                        }
                         layerErrors = this.layers[j].backpropagate(layerErrors, learningRate);
-                        if (layerErrors.some(err => !isValidNumber(err))) {
-                            throw new Error(`Invalid errors after backpropagation: ${layerErrors}`);
-                        }
                     }
                 } catch (error) {
                     console.error(`Error in epoch ${epoch + 1}, input ${i}:`, error);

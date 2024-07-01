@@ -20,20 +20,19 @@ export class Layer {
 
     backpropagate(errors: number[], learningRate: number): number[] {
         if (errors.length !== this.neurons.length) {
-            console.warn(`Mismatch between errors length (${errors.length}) and neurons count (${this.neurons.length}). Using the first error for all neurons.`);
-            errors = Array(this.neurons.length).fill(errors[0]);
+            throw new Error(`Mismatch between errors length (${errors.length}) and neurons count (${this.neurons.length})`);
         }
-        return this.neurons.map((neuron, i) => {
-            if (!isValidNumber(errors[i])) {
-                throw new Error(`Invalid error for neuron ${i}: ${errors[i]}`);
+        const nextErrors: number[] = new Array(this.neurons[0].weights.length).fill(0);
+        this.neurons.forEach((neuron, i) => {
+            const error = errors[i];
+            if (!isValidNumber(error)) {
+                throw new Error(`Invalid error for neuron ${i}: ${error}`);
             }
-            neuron.updateWeights(errors[i], learningRate);
-            return neuron.weights.reduce((sum, weight, j) => {
-                if (!isValidNumber(weight)) {
-                    throw new Error(`Invalid weight for neuron ${i}, input ${j}: ${weight}`);
-                }
-                return sum + weight * errors[i];
-            }, 0);
+            const deltas = neuron.updateWeights(error, learningRate);
+            deltas.forEach((delta, j) => {
+                nextErrors[j] += delta;
+            });
         });
+        return nextErrors;
     }
 }
