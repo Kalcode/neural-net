@@ -2,6 +2,10 @@ export function round(value: number, decimals: number = 6): number {
     return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals);
 }
 
+export function isValidNumber(value: number): boolean {
+    return typeof value === 'number' && isFinite(value) && !isNaN(value);
+}
+
 // console helpers
 export const consoleHelpers = {
     systemInfo: () => {

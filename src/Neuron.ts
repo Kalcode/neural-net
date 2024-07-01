@@ -1,4 +1,4 @@
-import { round } from './utils';
+import { round, isValidNumber } from './utils';
 
 export class Neuron {
     public weights: number[];
@@ -23,7 +23,7 @@ export class Neuron {
         return round(x * (1 - x));
     }
 
-    private clipGradient(gradient: number, clipValue: number = 5): number {
+    private clipGradient(gradient: number, clipValue: number = 1): number {
         return Math.max(-clipValue, Math.min(clipValue, gradient));
     }
 
@@ -33,16 +33,30 @@ export class Neuron {
         }
 
         this.lastInputs = inputs;
-        const weightedSum = round(inputs.reduce((sum, input, i) => sum + input * this.weights[i], 0) + this.bias);
+        const weightedSum = round(inputs.reduce((sum, input, i) => {
+            if (!isValidNumber(input) || !isValidNumber(this.weights[i])) {
+                throw new Error(`Invalid input or weight: input=${input}, weight=${this.weights[i]}`);
+            }
+            return sum + input * this.weights[i];
+        }, 0) + this.bias);
+
         this.lastOutput = this.sigmoid(weightedSum);
         return this.lastOutput;
     }
 
     updateWeights(error: number, learningRate: number): void {
+        if (!isValidNumber(error) || !isValidNumber(learningRate)) {
+            throw new Error(`Invalid error or learning rate: error=${error}, learningRate=${learningRate}`);
+        }
+
         const delta = this.clipGradient(error * this.sigmoidDerivative(this.lastOutput));
-        this.weights = this.weights.map((weight, i) => 
-            round(weight + learningRate * delta * this.lastInputs[i])
-        );
+        this.weights = this.weights.map((weight, i) => {
+            const update = round(learningRate * delta * this.lastInputs[i]);
+            if (!isValidNumber(update)) {
+                throw new Error(`Invalid weight update: update=${update}, weight=${weight}, input=${this.lastInputs[i]}`);
+            }
+            return round(weight + update);
+        });
         this.bias = round(this.bias + learningRate * delta);
     }
 }

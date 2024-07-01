@@ -1,5 +1,5 @@
 import { Layer } from './Layer';
-import { round } from './utils';
+import { round, isValidNumber } from './utils';
 
 export class Network {
     private layers: Layer[];
@@ -12,23 +12,44 @@ export class Network {
     }
 
     forward(inputs: number[]): number[] {
-        return this.layers.reduce((prev, layer) => layer.forward(prev), inputs);
+        return this.layers.reduce((prev, layer) => {
+            const output = layer.forward(prev);
+            if (output.some(v => !isValidNumber(v))) {
+                throw new Error(`Invalid layer output: ${output}`);
+            }
+            return output;
+        }, inputs);
     }
 
     train(inputs: number[][], targets: number[][], epochs: number, learningRate: number): void {
         for (let epoch = 0; epoch < epochs; epoch++) {
             let totalError = 0;
             for (let i = 0; i < inputs.length; i++) {
-                const output = this.forward(inputs[i]);
-                const errors = targets[i].map((t, j) => t - output[j]);
-                totalError += errors.reduce((sum, err) => sum + err * err, 0) / errors.length;
-                
-                let layerErrors = errors;
-                for (let j = this.layers.length - 1; j >= 0; j--) {
-                    layerErrors = this.layers[j].backpropagate(layerErrors, learningRate);
+                try {
+                    const output = this.forward(inputs[i]);
+                    const errors = targets[i].map((t, j) => {
+                        if (!isValidNumber(t) || !isValidNumber(output[j])) {
+                            throw new Error(`Invalid target or output: target=${t}, output=${output[j]}`);
+                        }
+                        return t - output[j];
+                    });
+                    totalError += errors.reduce((sum, err) => sum + err * err, 0) / errors.length;
+                    
+                    let layerErrors = errors;
+                    for (let j = this.layers.length - 1; j >= 0; j--) {
+                        layerErrors = this.layers[j].backpropagate(layerErrors, learningRate);
+                    }
+                } catch (error) {
+                    console.error(`Error in epoch ${epoch + 1}, input ${i}:`, error);
+                    return; // Stop training if an error occurs
                 }
             }
-            console.log(`Epoch ${epoch + 1}, Average Error: ${round(totalError / inputs.length)}`);
+            const averageError = round(totalError / inputs.length);
+            if (!isValidNumber(averageError)) {
+                console.error(`Invalid average error: ${averageError}`);
+                return; // Stop training if average error is invalid
+            }
+            console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}`);
         }
     }
 }
