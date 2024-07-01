@@ -1,31 +1,42 @@
 import { round } from './utils';
 
 export class Neuron {
-    private weights: number[];
-    private bias: number;
+    public weights: number[];
+    public bias: number;
+    private lastInputs: number[];
+    private lastOutput: number;
 
     constructor(inputSize: number) {
-        // Initialize weights randomly between -1 and 1
         this.weights = Array.from({ length: inputSize }, () => round(Math.random() * 2 - 1));
-        // Initialize bias randomly between -1 and 1
         this.bias = round(Math.random() * 2 - 1);
+        this.lastInputs = [];
+        this.lastOutput = 0;
     }
 
-    // Activation function (using sigmoid for this example)
     private sigmoid(x: number): number {
         return round(1 / (1 + Math.exp(-x)));
     }
 
-    // Forward pass
+    private sigmoidDerivative(x: number): number {
+        return round(x * (1 - x));
+    }
+
     forward(inputs: number[]): number {
         if (inputs.length !== this.weights.length) {
             throw new Error("Input size does not match weight size");
         }
 
-        // Calculate the weighted sum of inputs
-        const weightedSum = round(inputs.reduce((sum, input, i) => sum + input * this.weights[i], 0));
-        
-        // Add bias and apply activation function
-        return this.sigmoid(round(weightedSum + this.bias));
+        this.lastInputs = inputs;
+        const weightedSum = round(inputs.reduce((sum, input, i) => sum + input * this.weights[i], 0) + this.bias);
+        this.lastOutput = this.sigmoid(weightedSum);
+        return this.lastOutput;
+    }
+
+    updateWeights(error: number, learningRate: number): void {
+        const delta = error * this.sigmoidDerivative(this.lastOutput);
+        this.weights = this.weights.map((weight, i) => 
+            round(weight + learningRate * delta * this.lastInputs[i])
+        );
+        this.bias = round(this.bias + learningRate * delta);
     }
 }

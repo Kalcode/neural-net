@@ -1,28 +1,21 @@
-import { Layer } from './Layer';
+import { Network } from './Network';
 
-// Examples
-console.log("\nExamples:");
-// Create a simple XOR network
-// Input layer: 2 neurons (for 2 inputs)
-// Hidden layer: 2 neurons
-// Output layer: 1 neuron
+console.log("\nXOR Network Example:");
 
-const inputLayer = new Layer(2, 2);
-const outputLayer = new Layer(2, 1);
+// Create a XOR network
+const xorNetwork = new Network([2, 2, 1]);
 
-function xorNetwork(input1: number, input2: number): number {
-    const hiddenOutputs = inputLayer.forward([input1, input2]);
-    const finalOutput = outputLayer.forward(hiddenOutputs);
-    return finalOutput[0]; // We only have one output neuron
-}
+// XOR training data
+const inputs = [[0, 0], [0, 1], [1, 0], [1, 1]];
+const targets = [[0], [1], [1], [0]];
 
-// Test the XOR network
-console.log("XOR Network Test:");
-console.log(`0 XOR 0 = ${xorNetwork(0, 0)}`);
-console.log(`0 XOR 1 = ${xorNetwork(0, 1)}`);
-console.log(`1 XOR 0 = ${xorNetwork(1, 0)}`);
-console.log(`1 XOR 1 = ${xorNetwork(1, 1)}`);
+// Train the network
+console.log("Training the network...");
+xorNetwork.train(inputs, targets, 10000, 0.1);
 
-// Note: This network is not trained, so the outputs will be random.
-// In a fully implemented neural network, we would need to train the
-// network on XOR data to get accurate results.
+// Test the trained network
+console.log("\nTesting the trained network:");
+inputs.forEach(input => {
+    const output = xorNetwork.forward(input);
+    console.log(`${input[0]} XOR ${input[1]} = ${output[0].toFixed(4)}`);
+});
