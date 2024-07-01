@@ -12,11 +12,13 @@ class NeuralNetwork {
     private weightsHO: number[][];
     private biasH: number[];
     private biasO: number[];
+    private learningRate: number;
 
-    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number) {
+    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, learningRate: number = 0.1) {
         this.inputNodes = inputNodes;
         this.hiddenNodes = hiddenNodes;
         this.outputNodes = outputNodes;
+        this.learningRate = learningRate;
 
         // Initialize weights and biases with random values
         this.weightsIH = this.initializeWeights(this.hiddenNodes, this.inputNodes);
@@ -39,11 +41,15 @@ class NeuralNetwork {
         return 1 / (1 + Math.exp(-x));
     }
 
+    private sigmoidDerivative(x: number): number {
+        return x * (1 - x);
+    }
+
     private dotProduct(a: number[], b: number[]): number {
         return a.reduce((sum, val, i) => sum + val * b[i], 0);
     }
 
-    forward(input: number[]): number[] {
+    forward(input: number[]): { hidden: number[], output: number[] } {
         // Calculate hidden layer
         const hidden = this.weightsIH.map((weights, i) =>
             this.sigmoid(this.dotProduct(weights, input) + this.biasH[i])
@@ -54,13 +60,76 @@ class NeuralNetwork {
             this.sigmoid(this.dotProduct(weights, hidden) + this.biasO[i])
         );
 
-        return output;
+        return { hidden, output };
+    }
+
+    train(input: number[], target: number[]): void {
+        const { hidden, output } = this.forward(input);
+
+        // Calculate output layer errors
+        const outputErrors = output.map((out, i) => target[i] - out);
+
+        // Update weights and biases for the output layer
+        this.weightsHO.forEach((weights, i) => {
+            weights.forEach((_, j) => {
+                const delta = outputErrors[i] * this.sigmoidDerivative(output[i]) * hidden[j];
+                this.weightsHO[i][j] += this.learningRate * delta;
+            });
+            this.biasO[i] += this.learningRate * outputErrors[i] * this.sigmoidDerivative(output[i]);
+        });
+
+        // Calculate hidden layer errors
+        const hiddenErrors = this.weightsHO.reduce((errors, weights, i) => {
+            weights.forEach((weight, j) => {
+                errors[j] += outputErrors[i] * weight;
+            });
+            return errors;
+        }, new Array(this.hiddenNodes).fill(0));
+
+        // Update weights and biases for the hidden layer
+        this.weightsIH.forEach((weights, i) => {
+            weights.forEach((_, j) => {
+                const delta = hiddenErrors[i] * this.sigmoidDerivative(hidden[i]) * input[j];
+                this.weightsIH[i][j] += this.learningRate * delta;
+            });
+            this.biasH[i] += this.learningRate * hiddenErrors[i] * this.sigmoidDerivative(hidden[i]);
+        });
+    }
+
+    meanSquaredError(predictions: number[], targets: number[]): number {
+        return predictions.reduce((sum, pred, i) => sum + Math.pow(targets[i] - pred, 2), 0) / predictions.length;
     }
 }
 
-// Test the forward pass
-const nn = new NeuralNetwork(2, 2, 1);
-console.log(nn.forward([0, 0]));
-console.log(nn.forward([0, 1]));
-console.log(nn.forward([1, 0]));
-console.log(nn.forward([1, 1]));
+// XOR training data
+const trainingData = [
+    { input: [0, 0], target: [0] },
+    { input: [0, 1], target: [1] },
+    { input: [1, 0], target: [1] },
+    { input: [1, 1], target: [0] }
+];
+
+// Create and train the neural network
+const nn = new NeuralNetwork(2, 4, 1);
+const epochs = 10000;
+
+for (let i = 0; i < epochs; i++) {
+    trainingData.forEach(data => {
+        nn.train(data.input, data.target);
+    });
+
+    if (i % 1000 === 0) {
+        const mse = trainingData.reduce((sum, data) => {
+            const { output } = nn.forward(data.input);
+            return sum + nn.meanSquaredError(output, data.target);
+        }, 0) / trainingData.length;
+        console.log(`Epoch ${i}: MSE = ${mse}`);
+    }
+}
+
+// Test the trained network
+console.log("Testing the trained network:");
+trainingData.forEach(data => {
+    const { output } = nn.forward(data.input);
+    console.log(`Input: [${data.input}], Output: ${output[0].toFixed(4)}, Target: ${data.target[0]}`);
+});
