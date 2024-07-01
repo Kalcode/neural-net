@@ -1,6 +1,6 @@
 import { Neuron } from './Neuron';
 import BigNumber from 'bignumber.js';
-import { toBigNumber } from './utils';
+import { toBigNumber, isValidNumber } from './utils';
 
 export class Layer {
     public neurons: Neuron[];
@@ -14,7 +14,7 @@ export class Layer {
     }
 
     forward(inputs: BigNumber[]): BigNumber[] {
-        return this.neurons.map(neuron => neuron.forward(inputs));
+        return this.neurons.map(neuron => toBigNumber(neuron.forward(inputs)));
     }
 
     train(errors: BigNumber[], learningRate: BigNumber, inputs: BigNumber[], momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
