@@ -38,12 +38,23 @@ export class Network {
                     let layerErrors = errors;
                     for (let j = this.layers.length - 1; j >= 0; j--) {
                         console.log(`Before backpropagation - Layer ${j}, Errors:`, layerErrors);
+                        if (layerErrors.some(err => !isValidNumber(err))) {
+                            throw new Error(`Invalid errors before backpropagation: ${layerErrors}`);
+                        }
                         layerErrors = this.layers[j].backpropagate(layerErrors, learningRate);
                         console.log(`After backpropagation - Layer ${j}, New Errors:`, layerErrors);
+                        if (layerErrors.some(err => !isValidNumber(err))) {
+                            throw new Error(`Invalid errors after backpropagation: ${layerErrors}`);
+                        }
                     }
                 } catch (error) {
                     console.error(`Error in epoch ${epoch + 1}, input ${i}:`, error);
-                    console.error('Current state:', { inputs: inputs[i], output, errors, layerErrors });
+                    console.error('Current state:', { 
+                        inputs: inputs[i], 
+                        output: output || 'undefined', 
+                        errors: errors || 'undefined', 
+                        layerErrors: layerErrors || 'undefined' 
+                    });
                     return; // Stop training if an error occurs
                 }
             }
