@@ -28,8 +28,7 @@ export class Neuron {
 
     forward(inputs: number[]): number {
         if (inputs.length !== this.weights.length) {
-            console.warn(`Input size (${inputs.length}) does not match weight size (${this.weights.length}). Truncating or padding input.`);
-            inputs = inputs.slice(0, this.weights.length).concat(Array(Math.max(0, this.weights.length - inputs.length)).fill(0));
+            throw new Error(`Input size (${inputs.length}) does not match weight size (${this.weights.length}).`);
         }
 
         const weightedSum = inputs.reduce((sum, input, i) => {

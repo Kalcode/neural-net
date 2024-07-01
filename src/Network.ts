@@ -5,6 +5,9 @@ export class Network {
     private layers: Layer[];
 
     constructor(inputSize: number, hiddenSizes: number[], outputSize: number) {
+        if (inputSize < 1) {
+            throw new Error("Input size must be at least 1");
+        }
         if (hiddenSizes.length < 1) {
             throw new Error("Network must have at least one hidden layer");
         }
@@ -43,22 +46,13 @@ export class Network {
                     return batchTargets[j].map((t, k) => t - output[k]);
                 });
 
-                const batchError = batchErrors.reduce((sum, errors) => {
-                    const errorSum = errors.reduce((s, e) => {
-                        if (!isValidNumber(e)) {
-                            console.warn(`Invalid error: ${e}`);
-                            return s;
-                        }
-                        return s + e ** 2;
-                    }, 0);
-                    return sum + errorSum;
-                }, 0) / batchErrors.length;
-
-                if (isValidNumber(batchError)) {
-                    totalError += batchError;
-                } else {
-                    console.warn(`Invalid batch error: ${batchError}`);
+                const validErrors = batchErrors.flat().filter(isValidNumber);
+                if (validErrors.length === 0) {
+                    console.warn("All errors in the batch are invalid. Skipping batch.");
+                    continue;
                 }
+                const batchError = validErrors.reduce((sum, e) => sum + e ** 2, 0) / validErrors.length;
+                totalError += batchError;
 
                 for (let j = this.layers.length - 1; j >= 0; j--) {
                     const layerInputs = j === 0 ? batchInputs : this.layers[j-1].forward(batchInputs);
