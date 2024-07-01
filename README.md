@@ -4,6 +4,19 @@
 
 This project is a hands-on exploration of neural networks, implemented in TypeScript and run using Bun. The goal is to create a simple neural network from scratch to understand the underlying concepts and mechanisms.
 
+## What is a Neural Network?
+
+A neural network is a computational model inspired by the human brain. It consists of interconnected nodes (neurons) organized in layers. These networks can learn from data to perform tasks such as pattern recognition, classification, and prediction. Key components include:
+
+1. Input Layer: Receives initial data
+2. Hidden Layers: Process and transform data
+3. Output Layer: Produces the final result
+4. Weights and Biases: Adjustable parameters that the network learns
+5. Activation Functions: Non-linear functions that introduce complexity
+6. Training Process: Adjusting weights and biases to minimize errors
+
+Neural networks "learn" by adjusting their internal parameters based on the difference between their predictions and actual results, a process called backpropagation.
+
 ## Features
 
 - Implementation of a basic neural network in TypeScript
