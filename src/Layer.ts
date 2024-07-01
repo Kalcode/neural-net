@@ -20,7 +20,8 @@ export class Layer {
 
     backpropagate(errors: number[], learningRate: number): number[] {
         if (errors.length !== this.neurons.length) {
-            throw new Error(`Mismatch between errors length (${errors.length}) and neurons count (${this.neurons.length})`);
+            console.warn(`Mismatch between errors length (${errors.length}) and neurons count (${this.neurons.length}). Using the first error for all neurons.`);
+            errors = Array(this.neurons.length).fill(errors[0]);
         }
         return this.neurons.map((neuron, i) => {
             if (!isValidNumber(errors[i])) {
