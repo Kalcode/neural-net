@@ -21,10 +21,10 @@ export class Network {
             currentInputs = layer.forward(currentInputs);
             if (currentInputs.some(output => !isValidNumber(output))) {
                 console.error(`Invalid output from layer: ${currentInputs}`);
-                return currentInputs.map(() => 0.5); // Default to middle of output range
+                return currentInputs.map(() => toBigNumber(0.5)); // Default to middle of output range
             }
         }
-        return currentInputs;
+        return currentInputs.map(toBigNumber);
     }
 
     train(inputs: BigNumber[][], targets: BigNumber[][], epochs: number, learningRate: BigNumber, momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
