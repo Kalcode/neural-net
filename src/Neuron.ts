@@ -57,56 +57,41 @@ export class Neuron {
         return this.sigmoid(normalized);
     }
 
-    updateWeights(error: BigNumber, learningRate: BigNumber, inputs: BigNumber[], batchSize: BigNumber): void {
-        console.log(`Neuron updateWeights:`);
-        console.log(`Error:`, error.toString());
-        console.log(`Learning rate:`, learningRate.toString());
-        console.log(`Inputs:`, inputs.map(i => i.toString()));
-        
+    calculateGradients(error: BigNumber, inputs: BigNumber[]): { weightDeltas: BigNumber[], biasDelta: BigNumber } {
         const output = this.forward(inputs);
-        console.log(`Output:`, output.toString());
         
         // Add a small constant to prevent division by zero
         const delta = error.times(output).times(toBigNumber(1).minus(output).plus(toBigNumber(1e-7)));
-        console.log(`Delta:`, delta.toString());
 
         if (!isValidNumber(delta)) {
             console.error(`Invalid delta: ${delta.toString()}, error: ${error.toString()}, output: ${output.toString()}`);
-            return;
+            return { weightDeltas: this.weights.map(() => toBigNumber(0)), biasDelta: toBigNumber(0) };
         }
 
-        for (let i = 0; i < this.weights.length; i++) {
-            const weightDelta = learningRate.times(delta).times(inputs[i]);
-            console.log(`Weight ${i} delta:`, weightDelta.toString());
-            if (!isValidNumber(weightDelta)) {
-                console.error(`Invalid weight delta: ${weightDelta.toString()}`);
-                continue;
-            }
-            this.weights[i] = this.weights[i].plus(weightDelta);
-        }
-        
-        const biasDelta = learningRate.times(delta);
-        console.log(`Bias delta:`, biasDelta.toString());
-        if (isValidNumber(biasDelta)) {
-            this.bias = this.bias.plus(biasDelta);
-        } else {
-            console.error(`Invalid bias delta: ${biasDelta.toString()}`);
-        }
+        const weightDeltas = this.weights.map((_, i) => delta.times(inputs[i]));
+        const biasDelta = delta;
 
-        this.updateBatchNormParams(error, learningRate, inputs, batchSize);
+        return { weightDeltas, biasDelta };
     }
 
-    private updateBatchNormParams(error: BigNumber, learningRate: BigNumber, inputs: BigNumber[], batchSize: BigNumber): void {
-        const meanDelta = error.times(this.gamma).dividedBy(batchSize.sqrt());
+    applyGradients(weightDeltas: BigNumber[], biasDelta: BigNumber, learningRate: BigNumber): void {
+        this.weights = this.weights.map((w, i) => w.plus(weightDeltas[i].times(learningRate)));
+        this.bias = this.bias.plus(biasDelta.times(learningRate));
+
+        this.updateBatchNormParams(biasDelta, learningRate);
+    }
+
+    private updateBatchNormParams(error: BigNumber, learningRate: BigNumber): void {
+        const meanDelta = error.times(this.gamma);
         this.runningMean = this.runningMean.minus(learningRate.times(meanDelta));
 
-        const varianceDelta = error.times(this.gamma).dividedBy(batchSize.sqrt().times(this.runningVar.sqrt()));
+        const varianceDelta = error.times(this.gamma).dividedBy(this.runningVar.sqrt());
         this.runningVar = this.runningVar.minus(learningRate.times(varianceDelta));
 
-        const gammaDelta = error.times(this.batchNormalize(inputs[0])).dividedBy(batchSize);
+        const gammaDelta = error.times(this.batchNormalize(this.bias));
         this.gamma = this.gamma.minus(learningRate.times(gammaDelta));
 
-        const betaDelta = error.dividedBy(batchSize);
+        const betaDelta = error;
         this.beta = this.beta.minus(learningRate.times(betaDelta));
     }
 
