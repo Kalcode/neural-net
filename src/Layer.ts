@@ -1,17 +1,16 @@
 import { Neuron } from './Neuron';
-import BigNumber from 'bignumber.js';
-import { toBigNumber, isValidNumber } from './utils';
+import { isValidNumber } from './utils';
 
 export class Layer {
     public neurons: Neuron[];
-    private prevWeightDeltas: BigNumber[][];
-    private prevBiasDeltas: BigNumber[];
+    private prevWeightDeltas: number[][];
+    private prevBiasDeltas: number[];
     private invalidErrorCount: number;
 
     constructor(inputSize: number, outputSize: number) {
         this.neurons = Array.from({ length: outputSize }, () => new Neuron(inputSize));
-        this.prevWeightDeltas = Array.from({ length: outputSize }, () => Array(inputSize).fill(toBigNumber(0)));
-        this.prevBiasDeltas = Array(outputSize).fill(toBigNumber(0));
+        this.prevWeightDeltas = Array.from({ length: outputSize }, () => Array(inputSize).fill(0));
+        this.prevBiasDeltas = Array(outputSize).fill(0);
         this.invalidErrorCount = 0;
     }
 
@@ -23,11 +22,11 @@ export class Layer {
         this.invalidErrorCount = 0;
     }
 
-    forward(inputs: BigNumber[]): BigNumber[] {
-        return this.neurons.map(neuron => toBigNumber(neuron.forward(inputs)));
+    forward(inputs: number[]): number[] {
+        return this.neurons.map(neuron => neuron.forward(inputs));
     }
 
-    train(errors: BigNumber[], learningRate: BigNumber, inputs: BigNumber[], momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
+    train(errors: number[], learningRate: number, inputs: number[], momentum: number, batchSize: number, maxGradientNorm: number): void {
         if (errors.length !== this.neurons.length && this.neurons.length > 1) {
             errors = this.calculateHiddenLayerErrors(errors, inputs);
         }
@@ -35,29 +34,29 @@ export class Layer {
         this.neurons.forEach((neuron, i) => {
             const { weightDeltas, biasDelta } = neuron.calculateGradients(errors[i], inputs);
             
-            const newWeightDeltas = weightDeltas.map((delta, j) => delta.plus(momentum.times(this.prevWeightDeltas[i][j])));
-            const newBiasDelta = biasDelta.plus(momentum.times(this.prevBiasDeltas[i]));
+            const newWeightDeltas = weightDeltas.map((delta, j) => delta + momentum * this.prevWeightDeltas[i][j]);
+            const newBiasDelta = biasDelta + momentum * this.prevBiasDeltas[i];
 
             const gradients = [...newWeightDeltas, newBiasDelta];
-            const gradientNorm = toBigNumber(Math.sqrt(gradients.reduce((sum, g) => sum + g.pow(2).toNumber(), 0)));
-            const scalingFactor = BigNumber.minimum(toBigNumber(1), maxGradientNorm.dividedBy(gradientNorm));
+            const gradientNorm = Math.sqrt(gradients.reduce((sum, g) => sum + g ** 2, 0));
+            const scalingFactor = Math.min(1, maxGradientNorm / gradientNorm);
 
-            neuron.applyGradients(newWeightDeltas.map(d => d.times(scalingFactor)), newBiasDelta.times(scalingFactor), learningRate);
+            neuron.applyGradients(newWeightDeltas.map(d => d * scalingFactor), newBiasDelta * scalingFactor, learningRate);
 
             this.prevWeightDeltas[i] = newWeightDeltas;
             this.prevBiasDeltas[i] = newBiasDelta;
         });
     }
 
-    private calculateHiddenLayerErrors(outputErrors: BigNumber[], inputs: BigNumber[]): BigNumber[] {
-        const hiddenErrors: BigNumber[] = new Array(this.neurons.length).fill(toBigNumber(0));
+    private calculateHiddenLayerErrors(outputErrors: number[], inputs: number[]): number[] {
+        const hiddenErrors: number[] = new Array(this.neurons.length).fill(0);
 
         this.neurons.forEach((neuron, i) => {
             const output = neuron.forward(inputs);
-            const derivative = output.times(toBigNumber(1).minus(output)); // Derivative of sigmoid
+            const derivative = output * (1 - output); // Derivative of sigmoid
             
             outputErrors.forEach((outputError, j) => {
-                hiddenErrors[i] = hiddenErrors[i].plus(outputError.times(this.neurons[j].weights[i]).times(derivative));
+                hiddenErrors[i] += outputError * this.neurons[j].weights[i] * derivative;
             });
         });
 
