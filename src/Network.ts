@@ -4,14 +4,15 @@ import { isValidNumber } from './utils';
 export class Network {
     private layers: Layer[];
 
-    constructor(layerSizes: number[]) {
-        if (layerSizes.length < 2) {
-            throw new Error("Network must have at least input and output layers");
+    constructor(inputSize: number, hiddenSizes: number[], outputSize: number) {
+        if (hiddenSizes.length < 1) {
+            throw new Error("Network must have at least one hidden layer");
         }
-        this.layers = [];
-        for (let i = 1; i < layerSizes.length; i++) {
-            this.layers.push(new Layer(layerSizes[i-1], layerSizes[i]));
+        this.layers = [new Layer(inputSize, hiddenSizes[0])];
+        for (let i = 1; i < hiddenSizes.length; i++) {
+            this.layers.push(new Layer(hiddenSizes[i-1], hiddenSizes[i]));
         }
+        this.layers.push(new Layer(hiddenSizes[hiddenSizes.length - 1], outputSize));
     }
 
     forward(inputs: number[]): number[] {

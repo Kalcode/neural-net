@@ -3,7 +3,10 @@ import { Network } from './Network';
 console.log("\nXOR Network Example:");
 
 // Create a XOR network
-const xorNetwork = new Network([2, 2, 1]);
+const inputSize = 2;
+const hiddenSizes = [2];  
+const outputSize = 1;
+const xorNetwork = new Network(inputSize, hiddenSizes, outputSize);
 
 // XOR training data
 const inputs = [
