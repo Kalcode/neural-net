@@ -1,5 +1,6 @@
 import { Layer } from './Layer';
-import { isValidNumber } from './utils';
+import { isValidNumber, toBigNumber } from './utils';
+import BigNumber from 'bignumber.js';
 
 export class Network {
     private layers: Layer[];
@@ -14,8 +15,8 @@ export class Network {
         }
     }
 
-    forward(inputs: number[]): number[] {
-        let currentInputs = inputs;
+    forward(inputs: BigNumber[]): BigNumber[] {
+        let currentInputs = inputs.map(toBigNumber);
         for (const layer of this.layers) {
             currentInputs = layer.forward(currentInputs);
             if (currentInputs.some(output => !isValidNumber(output))) {
@@ -26,15 +27,15 @@ export class Network {
         return currentInputs;
     }
 
-    train(inputs: number[][], targets: number[][], epochs: number, learningRate: number): void {
-        const maxConsecutiveInvalidEpochs = 10;
-        let consecutiveInvalidEpochs = 0;
-        let bestAverageError = Infinity;
-        let epochsSinceImprovement = 0;
+    train(inputs: BigNumber[][], targets: BigNumber[][], epochs: number, learningRate: BigNumber, momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
+        const maxConsecutiveInvalidEpochs = toBigNumber(10);
+        let consecutiveInvalidEpochs = toBigNumber(0);
+        let bestAverageError = toBigNumber(Infinity);
+        let epochsSinceImprovement = toBigNumber(0);
 
         for (let epoch = 0; epoch < epochs; epoch++) {
-            let totalError = 0;
-            let validSamples = 0;
+            let totalError = toBigNumber(0);
+            let validSamples = toBigNumber(0);
             let epochValid = true;
 
             for (let i = 0; i < inputs.length; i++) {
@@ -51,13 +52,13 @@ export class Network {
                 console.log(`Target:`, targets[i]);
 
                 const errors = targets[i].map((t, j) => {
-                    const err = t - output[j];
+                    const err = toBigNumber(t).minus(output[j]);
                     if (!isValidNumber(err)) {
-                        console.error(`Invalid error at epoch ${epoch}, input ${i}, output ${j}: ${err}`);
+                        console.error(`Invalid error at epoch ${epoch}, input ${i}, output ${j}: ${err.toString()}`);
                         epochValid = false;
-                        return 0;
+                        return toBigNumber(0);
                     }
-                    console.log(`Error for output ${j}: ${err}`);
+                    console.log(`Error for output ${j}: ${err.toString()}`);
                     return err;
                 });
 
@@ -65,62 +66,62 @@ export class Network {
 
                 console.log(`Errors:`, errors);
 
-                const squaredErrors = errors.map(err => err * err);
+                const squaredErrors = errors.map(err => err.pow(2));
                 if (squaredErrors.some(val => !isValidNumber(val))) {
-                    console.error(`Invalid squared errors at epoch ${epoch}, input ${i}:`, squaredErrors);
+                    console.error(`Invalid squared errors at epoch ${epoch}, input ${i}:`, squaredErrors.map(e => e.toString()));
                     epochValid = false;
                     break;
                 }
 
-                totalError += squaredErrors.reduce((sum, err) => sum + err, 0) / errors.length;
-                validSamples++;
+                totalError = totalError.plus(squaredErrors.reduce((sum, err) => sum.plus(err), toBigNumber(0)).dividedBy(toBigNumber(errors.length)));
+                validSamples = validSamples.plus(1);
 
                 for (let j = this.layers.length - 1; j >= 0; j--) {
                     const layerInputs = j === 0 ? inputs[i] : this.layers[j-1].forward(inputs[i]);
                     console.log(`Training layer ${j}:`);
                     console.log(`Layer inputs:`, layerInputs);
-                    this.layers[j].train(errors, learningRate, layerInputs);
+                    this.layers[j].train(errors, learningRate, layerInputs, momentum, batchSize, maxGradientNorm);
                 }
             }
 
-            if (!epochValid || validSamples === 0) {
-                console.error(`Invalid epoch ${epoch}: ${validSamples} valid samples out of ${inputs.length}`);
-                consecutiveInvalidEpochs++;
-                if (consecutiveInvalidEpochs >= maxConsecutiveInvalidEpochs) {
-                    console.error(`Stopping training due to ${maxConsecutiveInvalidEpochs} consecutive invalid epochs`);
+            if (!epochValid || validSamples.isEqualTo(0)) {
+                console.error(`Invalid epoch ${epoch}: ${validSamples.toString()} valid samples out of ${inputs.length}`);
+                consecutiveInvalidEpochs = consecutiveInvalidEpochs.plus(1);
+                if (consecutiveInvalidEpochs.isGreaterThanOrEqualTo(maxConsecutiveInvalidEpochs)) {
+                    console.error(`Stopping training due to ${maxConsecutiveInvalidEpochs.toString()} consecutive invalid epochs`);
                     return;
                 }
                 continue;
             }
 
-            consecutiveInvalidEpochs = 0;
-            const averageError = totalError / validSamples;
+            consecutiveInvalidEpochs = toBigNumber(0);
+            const averageError = totalError.dividedBy(validSamples);
 
             if (!isValidNumber(averageError)) {
                 console.error(`Invalid average error at epoch ${epoch}: ${averageError}`);
                 continue;
             }
 
-            if (averageError < bestAverageError) {
+            if (averageError.isLessThan(bestAverageError)) {
                 bestAverageError = averageError;
-                epochsSinceImprovement = 0;
+                epochsSinceImprovement = toBigNumber(0);
             } else {
-                epochsSinceImprovement++;
+                epochsSinceImprovement = epochsSinceImprovement.plus(1);
             }
 
             if (epoch % 100 === 0 || epoch === epochs - 1) {
-                console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}, Valid Samples: ${validSamples}/${inputs.length}`);
+                console.log(`Epoch ${epoch + 1}, Average Error: ${averageError.toString()}, Valid Samples: ${validSamples.toString()}/${inputs.length}`);
             }
 
             // Early stopping condition
-            if (epochsSinceImprovement >= 1000) {
-                console.log(`Stopping early: No improvement for 1000 epochs. Best average error: ${bestAverageError}`);
+            if (epochsSinceImprovement.isGreaterThanOrEqualTo(1000)) {
+                console.log(`Stopping early: No improvement for 1000 epochs. Best average error: ${bestAverageError.toString()}`);
                 return;
             }
 
             // Stop if error is sufficiently low
-            if (averageError < 0.001) {
-                console.log(`Stopping early: Error threshold reached. Final average error: ${averageError}`);
+            if (averageError.isLessThan(0.001)) {
+                console.log(`Stopping early: Error threshold reached. Final average error: ${averageError.toString()}`);
                 return;
             }
         }
