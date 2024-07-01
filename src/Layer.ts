@@ -19,11 +19,14 @@ export class Layer {
 
     train(errors: BigNumber[], learningRate: BigNumber, inputs: BigNumber[], momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
         if (errors.length !== this.neurons.length) {
-            console.error(`Mismatch between errors length (${errors.length}) and neurons length (${this.neurons.length})`);
-            return;
+            console.warn(`Mismatch between errors length (${errors.length}) and neurons length (${this.neurons.length}). Using available errors.`);
         }
 
         this.neurons.forEach((neuron, i) => {
+            if (i >= errors.length) {
+                console.warn(`No error provided for neuron ${i}. Skipping training for this neuron.`);
+                return;
+            }
             if (!isValidNumber(errors[i])) {
                 console.error(`Invalid error for neuron ${i}: ${errors[i]}`);
                 return;
