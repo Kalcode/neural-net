@@ -19,14 +19,17 @@ export class Layer {
     }
 
     backpropagate(errors: number[], learningRate: number): number[] {
+        if (errors.length !== this.neurons.length) {
+            throw new Error(`Mismatch between errors length (${errors.length}) and neurons count (${this.neurons.length})`);
+        }
         return this.neurons.map((neuron, i) => {
             if (!isValidNumber(errors[i])) {
                 throw new Error(`Invalid error for neuron ${i}: ${errors[i]}`);
             }
             neuron.updateWeights(errors[i], learningRate);
             return neuron.weights.reduce((sum, weight, j) => {
-                if (!isValidNumber(weight) || !isValidNumber(errors[i])) {
-                    throw new Error(`Invalid weight or error: weight=${weight}, error=${errors[i]}`);
+                if (!isValidNumber(weight)) {
+                    throw new Error(`Invalid weight for neuron ${i}, input ${j}: ${weight}`);
                 }
                 return sum + weight * errors[i];
             }, 0);

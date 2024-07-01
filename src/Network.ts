@@ -58,6 +58,10 @@ export class Network {
                         errors: errors, 
                         layerErrors: layerErrors 
                     });
+                    console.error('Network state:', this.layers.map(layer => layer.neurons.map(neuron => ({
+                        weights: neuron.weights,
+                        bias: neuron.bias
+                    }))));
                     return; // Stop training if an error occurs
                 }
             }

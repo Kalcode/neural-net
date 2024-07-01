@@ -14,8 +14,8 @@ export class Neuron {
     }
 
     private sigmoid(x: number): number {
-        // Clip x to prevent extreme values
-        x = Math.max(-709, Math.min(709, x));
+        if (x < -709) return 0;
+        if (x > 709) return 1;
         return round(1 / (1 + Math.exp(-x)));
     }
 
