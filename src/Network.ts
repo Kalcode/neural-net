@@ -45,6 +45,11 @@ export class Network {
                     break;
                 }
 
+                console.log(`Epoch ${epoch}, Input ${i}:`);
+                console.log(`Input:`, inputs[i]);
+                console.log(`Output:`, output);
+                console.log(`Target:`, targets[i]);
+
                 const errors = targets[i].map((t, j) => {
                     const err = t - output[j];
                     if (!isValidNumber(err)) {
@@ -52,10 +57,13 @@ export class Network {
                         epochValid = false;
                         return 0;
                     }
+                    console.log(`Error for output ${j}: ${err}`);
                     return err;
                 });
 
                 if (!epochValid) break;
+
+                console.log(`Errors:`, errors);
 
                 const squaredErrors = errors.map(err => err * err);
                 if (squaredErrors.some(val => !isValidNumber(val))) {
@@ -69,6 +77,8 @@ export class Network {
 
                 for (let j = this.layers.length - 1; j >= 0; j--) {
                     const layerInputs = j === 0 ? inputs[i] : this.layers[j-1].forward(inputs[i]);
+                    console.log(`Training layer ${j}:`);
+                    console.log(`Layer inputs:`, layerInputs);
                     this.layers[j].train(errors, learningRate, layerInputs);
                 }
             }
