@@ -32,8 +32,13 @@ export class Neuron {
             inputs = inputs.slice(0, this.weights.length).concat(Array(Math.max(0, this.weights.length - inputs.length)).fill(0));
         }
 
-        const weightedSum = inputs.reduce((sum, input, i) => 
-            sum + input * this.weights[i], 0) + this.bias;
+        const weightedSum = inputs.reduce((sum, input, i) => {
+            if (!isValidNumber(input) || !isValidNumber(this.weights[i])) {
+                console.warn(`Invalid input or weight: input=${input}, weight=${this.weights[i]}`);
+                return sum;
+            }
+            return sum + input * this.weights[i];
+        }, 0) + this.bias;
 
         const normalized = this.batchNormalize(weightedSum);
         return this.sigmoid(normalized);
@@ -47,6 +52,11 @@ export class Neuron {
 
         try {
             const output = this.forward(inputs);
+
+            if (!isValidNumber(output)) {
+                console.error(`Invalid output in calculateGradients: ${output}`);
+                return { weightDeltas: this.weights.map(() => 0), biasDelta: 0 };
+            }
             
             // Add a small constant to prevent division by zero
             const delta = error * output * (1 - output + 1e-7);

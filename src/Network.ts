@@ -43,8 +43,22 @@ export class Network {
                     return batchTargets[j].map((t, k) => t - output[k]);
                 });
 
-                const batchError = batchErrors.reduce((sum, errors) => sum + errors.reduce((s, e) => s + e ** 2, 0), 0) / batchErrors.length;
-                totalError += batchError;
+                const batchError = batchErrors.reduce((sum, errors) => {
+                    const errorSum = errors.reduce((s, e) => {
+                        if (!isValidNumber(e)) {
+                            console.warn(`Invalid error: ${e}`);
+                            return s;
+                        }
+                        return s + e ** 2;
+                    }, 0);
+                    return sum + errorSum;
+                }, 0) / batchErrors.length;
+
+                if (isValidNumber(batchError)) {
+                    totalError += batchError;
+                } else {
+                    console.warn(`Invalid batch error: ${batchError}`);
+                }
 
                 for (let j = this.layers.length - 1; j >= 0; j--) {
                     const layerInputs = j === 0 ? batchInputs : this.layers[j-1].forward(batchInputs);
