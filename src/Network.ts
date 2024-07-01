@@ -5,8 +5,8 @@ export class Network {
     private layers: Layer[];
 
     constructor(inputSize: number, hiddenSizes: number[], outputSize: number) {
-        if (inputSize < 1) {
-            throw new Error("Input size must be at least 1");
+        if (inputSize !== hiddenSizes[0]) {
+            throw new Error(`Input size (${inputSize}) does not match the first hidden layer size (${hiddenSizes[0]})`);
         }
         if (hiddenSizes.length < 1) {
             throw new Error("Network must have at least one hidden layer");
