@@ -59,6 +59,11 @@ export class Neuron {
     }
 
     calculateGradients(error: BigNumber, inputs: BigNumber[]): { weightDeltas: BigNumber[], biasDelta: BigNumber } {
+        if (!isValidNumber(error)) {
+            console.error(`Invalid error in calculateGradients: ${error}`);
+            return { weightDeltas: this.weights.map(() => toBigNumber(0)), biasDelta: toBigNumber(0) };
+        }
+
         const output = this.forward(inputs);
         
         // Add a small constant to prevent division by zero
