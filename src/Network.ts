@@ -1,6 +1,5 @@
 import { Layer } from './Layer';
-import { isValidNumber, toBigNumber } from './utils';
-import BigNumber from 'bignumber.js';
+import { isValidNumber } from './utils';
 
 export class Network {
     private layers: Layer[];
@@ -15,19 +14,19 @@ export class Network {
         }
     }
 
-    forward(inputs: BigNumber[]): BigNumber[] {
-        let currentInputs = inputs.map(toBigNumber);
+    forward(inputs: number[]): number[] {
+        let currentInputs = inputs;
         for (const layer of this.layers) {
             currentInputs = layer.forward(currentInputs);
             if (currentInputs.some(output => !isValidNumber(output))) {
                 console.error(`Invalid output from layer: ${currentInputs}`);
-                return currentInputs.map(() => toBigNumber(0.5)); // Default to middle of output range
+                return currentInputs.map(() => 0.5); // Default to middle of output range
             }
         }
-        return currentInputs.map(toBigNumber);
+        return currentInputs;
     }
 
-    train(inputs: BigNumber[][], targets: BigNumber[][], epochs: number, learningRate: BigNumber, momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
+    train(inputs: number[][], targets: number[][], epochs: number, learningRate: number, momentum: number, batchSize: number, maxGradientNorm: number): void {
         const maxConsecutiveInvalidEpochs = 10;
         let consecutiveInvalidEpochs = 0;
         let bestAverageError = Infinity;
@@ -39,9 +38,9 @@ export class Network {
 
             for (let i = 0; i < inputs.length; i++) {
                 const output = this.forward(inputs[i]);
-                const errors = targets[i].map((t, j) => t.minus(output[j]));
+                const errors = targets[i].map((t, j) => t - output[j]);
 
-                totalError += errors.reduce((sum, err) => sum + err.pow(2).toNumber(), 0) / errors.length;
+                totalError += errors.reduce((sum, err) => sum + err ** 2, 0) / errors.length;
                 validSamples++;
 
                 for (let j = this.layers.length - 1; j >= 0; j--) {
