@@ -20,12 +20,13 @@ export class NeuralNetwork {
      * @param outputNodes Number of output nodes
      * @param learningRate Learning rate for weight updates (default: 0.1)
      */
-    constructor(
-        private inputNodes: number,
-        private hiddenNodes: number,
-        private outputNodes: number,
-        private learningRate: number = 0.1
-    ) {
+    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, learningRate: number = 0.1) {                                           
+        // add contructor values to instance
+        this.inputNodes = inputNodes;                                                                                                                 
+        this.hiddenNodes = hiddenNodes;                                                                                                               
+        this.outputNodes = outputNodes;                                                                                                               
+        this.learningRate = learningRate;
+
         // Initialize weights and biases with random values
         this.weightsIH = this.initializeWeights(this.hiddenNodes, this.inputNodes);
         this.weightsHO = this.initializeWeights(this.outputNodes, this.hiddenNodes);
