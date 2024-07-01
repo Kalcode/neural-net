@@ -34,11 +34,20 @@ The Half Adder is a digital circuit that performs addition of two binary digits.
 - Sum: The result of adding two bits (modulo 2)
 - Carry: The overflow bit when adding two bits
 
+
 Truth Table for Half Adder:
 - Input: 0, 0 -> Output: Sum = 0, Carry = 0
 - Input: 0, 1 -> Output: Sum = 1, Carry = 0
 - Input: 1, 0 -> Output: Sum = 1, Carry = 0
 - Input: 1, 1 -> Output: Sum = 0, Carry = 1
+
+```
+A | B | Sum | Carry
+0 | 0 |  0  |   0
+0 | 1 |  1  |   0
+1 | 0 |  1  |   0
+1 | 1 |  0  |   1
+```
 
 The neural network for the Half Adder problem has:
 - 2 input nodes (representing the two input bits)
