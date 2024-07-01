@@ -5,7 +5,7 @@ export class Network {
     private layers: Layer[];
 
     constructor(inputSize: number, hiddenSizes: number[], outputSize: number) {
-        if (inputSize !== hiddenSizes[0]) {
+        if (hiddenSizes.length === 0 || hiddenSizes[0] !== inputSize) {
             throw new Error(`Input size (${inputSize}) does not match the first hidden layer size (${hiddenSizes[0]})`);
         }
         if (hiddenSizes.length < 1) {
