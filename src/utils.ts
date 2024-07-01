@@ -1,9 +1,14 @@
-export function round(value: number, decimals: number = 6): number {
-    return Number(Math.round(Number(value + 'e' + decimals)) + 'e-' + decimals);
+import BigNumber from 'bignumber.js';
+
+export function isValidNumber(value: number | BigNumber): boolean {
+    if (value instanceof BigNumber) {
+        return !value.isNaN() && value.isFinite();
+    }
+    return typeof value === 'number' && isFinite(value) && !isNaN(value);
 }
 
-export function isValidNumber(value: number): boolean {
-    return typeof value === 'number' && isFinite(value) && !isNaN(value);
+export function toBigNumber(value: number | string | BigNumber): BigNumber {
+    return new BigNumber(value);
 }
 
 // console helpers
