@@ -12,12 +12,18 @@ export class Network {
     }
 
     forward(inputs: number[]): number[] {
-        return this.layers.reduce((prev, layer) => {
-            const output = layer.forward(prev);
-            if (output.some(v => !isValidNumber(v))) {
-                throw new Error(`Invalid layer output: ${output}`);
+        return this.layers.reduce((prev, layer, index) => {
+            try {
+                const output = layer.forward(prev);
+                if (output.some(v => !isValidNumber(v))) {
+                    throw new Error(`Invalid layer output: ${output}`);
+                }
+                return output;
+            } catch (error) {
+                console.error(`Error in forward pass at layer ${index}:`, error);
+                console.error('Input to layer:', prev);
+                throw error;
             }
-            return output;
         }, inputs);
     }
 
@@ -40,12 +46,10 @@ export class Network {
                     
                     layerErrors = errors;
                     for (let j = this.layers.length - 1; j >= 0; j--) {
-                        console.log(`Before backpropagation - Layer ${j}, Errors:`, layerErrors);
                         if (layerErrors.some(err => !isValidNumber(err))) {
                             throw new Error(`Invalid errors before backpropagation: ${layerErrors}`);
                         }
                         layerErrors = this.layers[j].backpropagate(layerErrors, learningRate);
-                        console.log(`After backpropagation - Layer ${j}, New Errors:`, layerErrors);
                         if (layerErrors.some(err => !isValidNumber(err))) {
                             throw new Error(`Invalid errors after backpropagation: ${layerErrors}`);
                         }
