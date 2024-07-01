@@ -51,7 +51,8 @@ export class Neuron {
         const output = this.forward(inputs);
         console.log(`Output:`, output);
         
-        const delta = error * output * (1 - output);
+        // Add a small constant to prevent division by zero
+        const delta = error * output * (1 - output + 1e-7);
         console.log(`Delta:`, delta);
 
         if (!isValidNumber(delta)) {
@@ -76,5 +77,11 @@ export class Neuron {
         } else {
             console.error(`Invalid bias delta: ${biasDelta}`);
         }
+    }
+
+    // Add a method to clip weights and bias to prevent exploding gradients
+    clipWeightsAndBias(min: number = -1, max: number = 1): void {
+        this.weights = this.weights.map(w => Math.max(min, Math.min(max, w)));
+        this.bias = Math.max(min, Math.min(max, this.bias));
     }
 }

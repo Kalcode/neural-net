@@ -19,6 +19,7 @@ export class Layer {
         this.neurons.forEach((neuron, i) => {
             console.log(`Training neuron ${i}:`);
             neuron.updateWeights(errors[i], learningRate, inputs);
+            neuron.clipWeightsAndBias();
         });
     }
 }
