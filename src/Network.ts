@@ -115,6 +115,8 @@ export class Network {
                 epochsSinceImprovement = epochsSinceImprovement.plus(1);
             }
 
+            console.log(`Epoch ${epoch + 1}, Average Error: ${averageError.toString()}, Valid Samples: ${validSamples.toString()}/${inputs.length}, Total Invalid Errors: ${totalInvalidErrors}`);
+
 
             // Early stopping condition
             if (epochsSinceImprovement.isGreaterThanOrEqualTo(1000)) {
