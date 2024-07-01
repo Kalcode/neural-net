@@ -76,10 +76,12 @@ export class Neuron {
     }
 
     private updateBatchNormParams(error: number, learningRate: number): void {
+        const epsilon = 1e-8; // Small constant to avoid division by zero
+
         const meanDelta = error * this.gamma;
         this.runningMean -= learningRate * meanDelta;
 
-        const varianceDelta = error * this.gamma / Math.sqrt(this.runningVar);
+        const varianceDelta = error * this.gamma / Math.sqrt(this.runningVar + epsilon);
         this.runningVar -= learningRate * varianceDelta;
 
         const gammaDelta = error * this.batchNormalize(this.bias);

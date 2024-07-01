@@ -51,9 +51,8 @@ export class Layer {
     private calculateHiddenLayerErrors(outputErrors: number[], inputs: number[]): number[] {
         const hiddenErrors: number[] = new Array(this.neurons.length).fill(0);
 
-        this.neurons.forEach((neuron, i) => {
-            const output = neuron.forward(inputs);
-            const derivative = output * (1 - output); // Derivative of sigmoid
+        this.neurons.forEach((_, i) => {
+            const derivative = this.neurons[i].forward(inputs) * (1 - this.neurons[i].forward(inputs)); // Derivative of sigmoid
             
             outputErrors.forEach((outputError, j) => {
                 hiddenErrors[i] += outputError * this.neurons[j].weights[i] * derivative;

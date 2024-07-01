@@ -27,29 +27,31 @@ export class Network {
     }
 
     train(inputs: number[][], targets: number[][], epochs: number, learningRate: number, momentum: number, batchSize: number, maxGradientNorm: number): void {
-        const maxConsecutiveInvalidEpochs = 10;
-        let consecutiveInvalidEpochs = 0;
         let bestAverageError = Infinity;
         let epochsSinceImprovement = 0;
 
         for (let epoch = 0; epoch < epochs; epoch++) {
             let totalError = 0;
-            let validSamples = 0;
 
-            for (let i = 0; i < inputs.length; i++) {
-                const output = this.forward(inputs[i]);
-                const errors = targets[i].map((t, j) => t - output[j]);
+            for (let i = 0; i < inputs.length; i += batchSize) {
+                const batchInputs = inputs.slice(i, i + batchSize);
+                const batchTargets = targets.slice(i, i + batchSize);
 
-                totalError += errors.reduce((sum, err) => sum + err ** 2, 0) / errors.length;
-                validSamples++;
+                const batchErrors = batchInputs.map((input, j) => {
+                    const output = this.forward(input);
+                    return batchTargets[j].map((t, k) => t - output[k]);
+                });
+
+                const batchError = batchErrors.reduce((sum, errors) => sum + errors.reduce((s, e) => s + e ** 2, 0), 0) / batchErrors.length;
+                totalError += batchError;
 
                 for (let j = this.layers.length - 1; j >= 0; j--) {
-                    const layerInputs = j === 0 ? inputs[i] : this.layers[j-1].forward(inputs[i]);
-                    this.layers[j].train(errors, learningRate, layerInputs, momentum, batchSize, maxGradientNorm);
+                    const layerInputs = j === 0 ? batchInputs : this.layers[j-1].forward(batchInputs);
+                    this.layers[j].train(batchErrors.flat(), learningRate, layerInputs, momentum, batchSize, maxGradientNorm);
                 }
             }
 
-            const averageError = totalError / validSamples;
+            const averageError = totalError / (inputs.length / batchSize);
 
             if (averageError < bestAverageError) {
                 bestAverageError = averageError;
@@ -58,11 +60,11 @@ export class Network {
                 epochsSinceImprovement++;
             }
 
-            console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}, Valid Samples: ${validSamples}/${inputs.length}`);
+            console.log(`Epoch ${epoch + 1}, Average Error: ${averageError}`);
 
             // Early stopping conditions
-            if (epochsSinceImprovement >= 1000) {
-                console.log(`Stopping early: No improvement for 1000 epochs. Best average error: ${bestAverageError}`);
+            if (epochsSinceImprovement >= 100) {
+                console.log(`Stopping early: No improvement for 100 epochs. Best average error: ${bestAverageError}`);
                 return;
             }
 
