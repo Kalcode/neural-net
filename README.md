@@ -22,6 +22,22 @@ Neural networks "learn" by adjusting their internal parameters based on the diff
 - Implementation of a basic neural network in TypeScript
 - Utilizes Bun for fast execution and development
 - Designed for learning and experimentation
+- Demonstrates solving the XOR problem using a neural network
+
+## XOR Problem
+
+The XOR (exclusive OR) problem is a classic example used to demonstrate the capability of neural networks. The XOR function takes two binary inputs and returns 1 if exactly one of the inputs is 1, and 0 otherwise. The truth table for XOR is:
+
+| Input 1 | Input 2 | Output |
+|---------|---------|--------|
+|    0    |    0    |    0   |
+|    0    |    1    |    1   |
+|    1    |    0    |    1   |
+|    1    |    1    |    0   |
+
+A single-layer perceptron cannot learn the XOR function, as it is not linearly separable. However, a multi-layer perceptron (MLP) with at least one hidden layer can learn to approximate the XOR function.
+
+In this project, we train an MLP to solve the XOR problem and observe its learning progress.
 
 ## Prerequisites
 
