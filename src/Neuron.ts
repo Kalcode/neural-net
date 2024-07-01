@@ -50,15 +50,29 @@ export class Neuron {
         }
 
         const delta = this.clipGradient(error * this.sigmoidDerivative(this.lastOutput));
+        if (!isValidNumber(delta)) {
+            throw new Error(`Invalid delta: ${delta}, error: ${error}, lastOutput: ${this.lastOutput}`);
+        }
+
         const deltas = this.weights.map((weight, i) => {
+            if (!isValidNumber(this.lastInputs[i])) {
+                throw new Error(`Invalid last input at index ${i}: ${this.lastInputs[i]}`);
+            }
             const update = round(learningRate * delta * this.lastInputs[i]);
             if (!isValidNumber(update)) {
+                console.error(`Debug info: learningRate=${learningRate}, delta=${delta}, lastInput=${this.lastInputs[i]}`);
                 throw new Error(`Invalid weight update: update=${update}, weight=${weight}, input=${this.lastInputs[i]}`);
             }
             this.weights[i] = round(weight + update);
             return delta * weight;
         });
-        this.bias = round(this.bias + learningRate * delta);
+
+        const biasUpdate = round(learningRate * delta);
+        if (!isValidNumber(biasUpdate)) {
+            throw new Error(`Invalid bias update: ${biasUpdate}`);
+        }
+        this.bias = round(this.bias + biasUpdate);
+
         return deltas;
     }
 }
