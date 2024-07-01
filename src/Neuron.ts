@@ -14,11 +14,17 @@ export class Neuron {
     }
 
     private sigmoid(x: number): number {
+        // Clip x to prevent extreme values
+        x = Math.max(-709, Math.min(709, x));
         return round(1 / (1 + Math.exp(-x)));
     }
 
     private sigmoidDerivative(x: number): number {
         return round(x * (1 - x));
+    }
+
+    private clipGradient(gradient: number, clipValue: number = 5): number {
+        return Math.max(-clipValue, Math.min(clipValue, gradient));
     }
 
     forward(inputs: number[]): number {
@@ -33,7 +39,7 @@ export class Neuron {
     }
 
     updateWeights(error: number, learningRate: number): void {
-        const delta = error * this.sigmoidDerivative(this.lastOutput);
+        const delta = this.clipGradient(error * this.sigmoidDerivative(this.lastOutput));
         this.weights = this.weights.map((weight, i) => 
             round(weight + learningRate * delta * this.lastInputs[i])
         );
