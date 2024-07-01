@@ -21,18 +21,8 @@ export class Neuron {
     private sigmoid(x: BigNumber): BigNumber {
         if (x.isLessThan(-709)) return toBigNumber(0);
         if (x.isGreaterThan(709)) return toBigNumber(1);
-        try {
-            const exp = toBigNumber(Math.exp(x.negated().toNumber()));
-            const result = toBigNumber(1).dividedBy(toBigNumber(1).plus(exp));
-            if (!isValidNumber(result)) {
-                console.error(`Invalid sigmoid result: ${result.toString()} for input ${x.toString()}`);
-                return toBigNumber(0.5); // Default to middle of sigmoid range
-            }
-            return result;
-        } catch (error) {
-            console.error(`Error in sigmoid function: ${error}`);
-            return toBigNumber(0.5); // Default to middle of sigmoid range
-        }
+        const exp = Math.exp(-x.toNumber());
+        return toBigNumber(1 / (1 + exp));
     }
 
     private batchNormalize(x: BigNumber): BigNumber {
@@ -45,27 +35,11 @@ export class Neuron {
             throw new Error("Input size does not match weight size");
         }
 
-        try {
-            const weightedSum = inputs.reduce((sum, input, i) => {
-                const product = input.times(this.weights[i]);
-                if (!isValidNumber(product)) {
-                    console.error(`Invalid product: ${input.toString()} * ${this.weights[i].toString()} = ${product.toString()}`);
-                    return sum;
-                }
-                return sum.plus(product);
-            }, toBigNumber(0)).plus(this.bias);
+        const weightedSum = inputs.reduce((sum, input, i) => 
+            sum.plus(input.times(this.weights[i])), toBigNumber(0)).plus(this.bias);
 
-            if (!isValidNumber(weightedSum)) {
-                console.error(`Invalid weighted sum: ${weightedSum.toString()}`);
-                return toBigNumber(0.5); // Default to middle of output range
-            }
-
-            const normalized = this.batchNormalize(weightedSum);
-            return this.sigmoid(normalized);
-        } catch (error) {
-            console.error(`Error in forward pass: ${error}`);
-            return toBigNumber(0.5); // Default to middle of output range
-        }
+        const normalized = this.batchNormalize(weightedSum);
+        return this.sigmoid(normalized);
     }
 
     calculateGradients(error: BigNumber, inputs: BigNumber[]): { weightDeltas: BigNumber[], biasDelta: BigNumber } {
