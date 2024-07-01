@@ -1,26 +1,51 @@
-# Neural Network Implementation for XOR and AND Problems
+# Neural Network Implementation for XOR, AND, OR, NAND, and Half Adder Problems
 
-This document provides a detailed breakdown of the neural network implementation used to solve both the XOR and AND problems.
+This document provides a detailed breakdown of the neural network implementation used to solve XOR, AND, OR, NAND, and Half Adder problems.
 
 ## Overview
 
-The implementation consists of a `NeuralNetwork` class that creates a feedforward neural network with one hidden layer. The network is trained to learn either the XOR or AND function using backpropagation.
+The implementation consists of a `NeuralNetwork` class that creates a feedforward neural network with one hidden layer. The network is trained to learn various logical functions using backpropagation.
 
 ## Project Structure
 
 - `src/NeuralNetwork.ts`: Contains the `NeuralNetwork` class implementation.
 - `examples/xor/index.ts`: Example of training and testing the network on the XOR problem.
 - `examples/and/index.ts`: Example of training and testing the network on the AND problem.
+- `examples/or/index.ts`: Example of training and testing the network on the OR problem.
+- `examples/nand/index.ts`: Example of training and testing the network on the NAND problem.
+- `examples/half-adder/index.ts`: Example of training and testing the network on the Half Adder problem.
 
 ## Network Architecture
 
 - Input layer: 2 nodes
 - Hidden layer: 
-  - 4 nodes for XOR
-  - 3 nodes for AND and OR
-- Output layer: 1 node
+  - 4 nodes for XOR and Half Adder
+  - 3 nodes for AND, OR, and NAND
+- Output layer: 
+  - 1 node for XOR, AND, OR, and NAND
+  - 2 nodes for Half Adder
 
 Note: The number of hidden nodes can be adjusted based on the complexity of the problem.
+
+## Half Adder Example
+
+The Half Adder is a digital circuit that performs addition of two binary digits. It produces two outputs: Sum and Carry.
+
+- Sum: The result of adding two bits (modulo 2)
+- Carry: The overflow bit when adding two bits
+
+Truth Table for Half Adder:
+- Input: 0, 0 -> Output: Sum = 0, Carry = 0
+- Input: 0, 1 -> Output: Sum = 1, Carry = 0
+- Input: 1, 0 -> Output: Sum = 1, Carry = 0
+- Input: 1, 1 -> Output: Sum = 0, Carry = 1
+
+The neural network for the Half Adder problem has:
+- 2 input nodes (representing the two input bits)
+- 4 hidden nodes
+- 2 output nodes (representing Sum and Carry)
+
+This example demonstrates the network's ability to learn more complex logical operations with multiple outputs.
 
 ## Key Components
 
