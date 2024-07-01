@@ -43,8 +43,16 @@ export class Neuron {
     }
 
     updateWeights(error: number, learningRate: number, inputs: number[]): void {
+        console.log(`Neuron updateWeights:`);
+        console.log(`Error:`, error);
+        console.log(`Learning rate:`, learningRate);
+        console.log(`Inputs:`, inputs);
+        
         const output = this.forward(inputs);
+        console.log(`Output:`, output);
+        
         const delta = error * output * (1 - output);
+        console.log(`Delta:`, delta);
 
         if (!isValidNumber(delta)) {
             console.error(`Invalid delta: ${delta}, error: ${error}, output: ${output}`);
@@ -53,6 +61,7 @@ export class Neuron {
 
         for (let i = 0; i < this.weights.length; i++) {
             const weightDelta = learningRate * delta * inputs[i];
+            console.log(`Weight ${i} delta:`, weightDelta);
             if (!isValidNumber(weightDelta)) {
                 console.error(`Invalid weight delta: ${weightDelta}`);
                 continue;
@@ -61,6 +70,7 @@ export class Neuron {
         }
         
         const biasDelta = learningRate * delta;
+        console.log(`Bias delta:`, biasDelta);
         if (isValidNumber(biasDelta)) {
             this.bias += biasDelta;
         } else {

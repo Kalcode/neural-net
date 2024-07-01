@@ -12,7 +12,12 @@ export class Layer {
     }
 
     train(errors: number[], learningRate: number, inputs: number[]): void {
+        console.log(`Layer training:`);
+        console.log(`Errors:`, errors);
+        console.log(`Learning rate:`, learningRate);
+        console.log(`Inputs:`, inputs);
         this.neurons.forEach((neuron, i) => {
+            console.log(`Training neuron ${i}:`);
             neuron.updateWeights(errors[i], learningRate, inputs);
         });
     }
