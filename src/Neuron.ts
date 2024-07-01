@@ -1,17 +1,19 @@
+import { round } from './utils';
+
 export class Neuron {
     private weights: number[];
     private bias: number;
 
     constructor(inputSize: number) {
         // Initialize weights randomly between -1 and 1
-        this.weights = Array.from({ length: inputSize }, () => Math.random() * 2 - 1);
+        this.weights = Array.from({ length: inputSize }, () => round(Math.random() * 2 - 1));
         // Initialize bias randomly between -1 and 1
-        this.bias = Math.random() * 2 - 1;
+        this.bias = round(Math.random() * 2 - 1);
     }
 
     // Activation function (using sigmoid for this example)
     private sigmoid(x: number): number {
-        return 1 / (1 + Math.exp(-x));
+        return round(1 / (1 + Math.exp(-x)));
     }
 
     // Forward pass
@@ -21,9 +23,9 @@ export class Neuron {
         }
 
         // Calculate the weighted sum of inputs
-        const weightedSum = inputs.reduce((sum, input, i) => sum + input * this.weights[i], 0);
+        const weightedSum = round(inputs.reduce((sum, input, i) => sum + input * this.weights[i], 0));
         
         // Add bias and apply activation function
-        return this.sigmoid(weightedSum + this.bias);
+        return this.sigmoid(round(weightedSum + this.bias));
     }
 }
