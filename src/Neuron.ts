@@ -54,25 +54,26 @@ export class Neuron {
             throw new Error(`Invalid delta: ${delta}, error: ${error}, lastOutput: ${this.lastOutput}`);
         }
 
+        const MIN_UPDATE = 1e-10; // Minimum update value
         const deltas = this.weights.map((weight, i) => {
             if (!isValidNumber(this.lastInputs[i])) {
                 throw new Error(`Invalid last input at index ${i}: ${this.lastInputs[i]}`);
             }
-            const update = round(learningRate * delta * this.lastInputs[i]);
-            if (!isValidNumber(update)) {
-                console.warn(`Warning: Invalid weight update. Using 0 instead. Debug info: learningRate=${learningRate}, delta=${delta}, lastInput=${this.lastInputs[i]}`);
-                return 0;
+            let update = round(learningRate * delta * this.lastInputs[i]);
+            if (!isValidNumber(update) || Math.abs(update) < MIN_UPDATE) {
+                update = Math.sign(update) * MIN_UPDATE;
+                console.warn(`Warning: Small weight update. Using ${update} instead. Debug info: learningRate=${learningRate}, delta=${delta}, lastInput=${this.lastInputs[i]}`);
             }
             this.weights[i] = round(weight + update);
             return delta * weight;
         });
 
-        const biasUpdate = round(learningRate * delta);
-        if (!isValidNumber(biasUpdate)) {
-            console.warn(`Warning: Invalid bias update. Using 0 instead. Debug info: learningRate=${learningRate}, delta=${delta}`);
-        } else {
-            this.bias = round(this.bias + biasUpdate);
+        let biasUpdate = round(learningRate * delta);
+        if (!isValidNumber(biasUpdate) || Math.abs(biasUpdate) < MIN_UPDATE) {
+            biasUpdate = Math.sign(biasUpdate) * MIN_UPDATE;
+            console.warn(`Warning: Small bias update. Using ${biasUpdate} instead. Debug info: learningRate=${learningRate}, delta=${delta}`);
         }
+        this.bias = round(this.bias + biasUpdate);
 
         return deltas;
     }
