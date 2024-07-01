@@ -37,6 +37,10 @@ export class Network {
             let totalError = toBigNumber(0);
             let validSamples = toBigNumber(0);
             let epochValid = true;
+            let totalInvalidErrors = 0;
+
+            // Reset invalid error counts for all layers
+            this.layers.forEach(layer => layer.resetInvalidErrorCount());
 
             for (let i = 0; i < inputs.length; i++) {
                 const output = this.forward(inputs[i]);
@@ -82,6 +86,7 @@ export class Network {
                 for (let j = this.layers.length - 1; j >= 0; j--) {
                     const layerInputs = j === 0 ? inputs[i] : this.layers[j-1].forward(inputs[i]);
                     this.layers[j].train(errors, learningRate, layerInputs, momentum, batchSize, maxGradientNorm);
+                    totalInvalidErrors += this.layers[j].getInvalidErrorCount();
                 }
             }
 
