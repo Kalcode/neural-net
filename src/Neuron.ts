@@ -8,6 +8,8 @@ export class Neuron {
     }
 
     private sigmoid(x: number): number {
+        if (x < -709) return 0;
+        if (x > 709) return 1;
         return 1 / (1 + Math.exp(-x));
     }
 
