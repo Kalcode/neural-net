@@ -2,25 +2,27 @@ import { Network } from './Network';
 
 console.log("\nXOR Network Example:");
 
+// XOR training data
+const inputs = [
+  [0, 0],
+  [0, 1],
+  [1, 0],
+  [1, 1]
+];
+const targets = [
+  [0],
+  [1],
+  [1],
+  [0]
+];
+
 // Create a XOR network
 const inputSize = inputs[0].length;
 const hiddenSizes = [2];  
 const outputSize = 1;
 const xorNetwork = new Network(inputSize, hiddenSizes, outputSize);
 
-// XOR training data
-const inputs = [
-    [0, 0],
-    [0, 1],
-    [1, 0],
-    [1, 1]
-];
-const targets = [
-    [0],
-    [1],
-    [1],
-    [0]
-];
+
 
 // Train the network
 console.log("Training the network...");
