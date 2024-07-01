@@ -1,15 +1,15 @@
 import { NeuralNetwork } from './NeuralNetwork';
 
-// XOR training data
+// AND training data
 const trainingData = [
     { input: [0, 0], target: [0] },
-    { input: [0, 1], target: [1] },
-    { input: [1, 0], target: [1] },
-    { input: [1, 1], target: [0] }
+    { input: [0, 1], target: [0] },
+    { input: [1, 0], target: [0] },
+    { input: [1, 1], target: [1] }
 ];
 
 // Create and train the neural network
-const nn = new NeuralNetwork(2, 4, 1);
+const nn = new NeuralNetwork(2, 3, 1);
 const epochs = 10000;
 
 console.log("Training the neural network...");
