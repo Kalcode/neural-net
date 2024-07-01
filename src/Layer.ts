@@ -28,15 +28,12 @@ export class Layer {
     }
 
     train(errors: BigNumber[], learningRate: BigNumber, inputs: BigNumber[], momentum: BigNumber, batchSize: BigNumber, maxGradientNorm: BigNumber): void {
-        if (errors.length !== this.neurons.length) {
-            console.warn(`Mismatch between errors length (${errors.length}) and neurons length (${this.neurons.length}). Using available errors.`);
+        if (errors.length !== this.neurons.length && this.neurons.length > 1) {
+            // For hidden layers, we need to calculate errors for all neurons
+            errors = this.calculateHiddenLayerErrors(errors, inputs);
         }
 
         this.neurons.forEach((neuron, i) => {
-            if (i >= errors.length) {
-                console.warn(`No error provided for neuron ${i}. Skipping training for this neuron.`);
-                return;
-            }
             if (!isValidNumber(errors[i])) {
                 console.error(`Invalid error for neuron ${i}: ${errors[i]}`);
                 this.invalidErrorCount++;
@@ -71,5 +68,20 @@ export class Layer {
             this.prevWeightDeltas[i] = newWeightDeltas;
             this.prevBiasDeltas[i] = newBiasDelta;
         });
+    }
+
+    private calculateHiddenLayerErrors(outputErrors: BigNumber[], inputs: BigNumber[]): BigNumber[] {
+        const hiddenErrors: BigNumber[] = new Array(this.neurons.length).fill(toBigNumber(0));
+
+        this.neurons.forEach((neuron, i) => {
+            const output = neuron.forward(inputs);
+            const derivative = output.times(toBigNumber(1).minus(output)); // Derivative of sigmoid
+            
+            outputErrors.forEach((outputError, j) => {
+                hiddenErrors[i] = hiddenErrors[i].plus(outputError.times(this.neurons[j].weights[i]).times(derivative));
+            });
+        });
+
+        return hiddenErrors;
     }
 }
