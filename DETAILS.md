@@ -1,15 +1,23 @@
-# Neural Network Implementation for XOR Problem
+# Neural Network Implementation for XOR and AND Problems
 
-This document provides a detailed breakdown of the neural network implementation used to solve the XOR problem.
+This document provides a detailed breakdown of the neural network implementation used to solve both the XOR and AND problems.
 
 ## Overview
 
-The implementation consists of a `NeuralNetwork` class that creates a feedforward neural network with one hidden layer. The network is trained to learn the XOR function using backpropagation.
+The implementation consists of a `NeuralNetwork` class that creates a feedforward neural network with one hidden layer. The network is trained to learn either the XOR or AND function using backpropagation.
+
+## Project Structure
+
+- `src/NeuralNetwork.ts`: Contains the `NeuralNetwork` class implementation.
+- `examples/xor/index.ts`: Example of training and testing the network on the XOR problem.
+- `examples/and/index.ts`: Example of training and testing the network on the AND problem.
 
 ## Network Architecture
 
 - Input layer: 2 nodes
-- Hidden layer: 4 nodes
+- Hidden layer: 
+  - 4 nodes for XOR
+  - 3 nodes for AND
 - Output layer: 1 node
 
 ## Key Components
@@ -54,14 +62,14 @@ The `meanSquaredError` method calculates the average squared difference between 
 
 ## Training Process
 
-- The network is trained for 10,000 epochs.
-- In each epoch, it trains on all four XOR input-output pairs.
+- The network is trained for 10,000 epochs in both XOR and AND examples.
+- In each epoch, it trains on all four input-output pairs for the respective function.
 - The Mean Squared Error is calculated and logged every 1000 epochs to track progress.
 
 ## Testing
 
-After training, the network is tested on all four XOR input combinations to verify its learning.
+After training, the network is tested on all four input combinations for either XOR or AND to verify its learning.
 
 ## Conclusion
 
-This implementation demonstrates a basic yet functional neural network capable of learning the XOR function, showcasing key concepts like feedforward propagation, backpropagation, and gradient descent optimization.
+This implementation demonstrates a basic yet functional neural network capable of learning both the XOR and AND functions, showcasing key concepts like feedforward propagation, backpropagation, and gradient descent optimization. The flexibility of the `NeuralNetwork` class allows it to be used for different logical operations by adjusting the network architecture and training data.
