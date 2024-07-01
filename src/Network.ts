@@ -25,9 +25,12 @@ export class Network {
         for (let epoch = 0; epoch < epochs; epoch++) {
             let totalError = 0;
             for (let i = 0; i < inputs.length; i++) {
+                let output: number[] = [];
+                let errors: number[] = [];
+                let layerErrors: number[] = [];
                 try {
-                    const output = this.forward(inputs[i]);
-                    const errors = targets[i].map((t, j) => {
+                    output = this.forward(inputs[i]);
+                    errors = targets[i].map((t, j) => {
                         if (!isValidNumber(t) || !isValidNumber(output[j])) {
                             throw new Error(`Invalid target or output: target=${t}, output=${output[j]}`);
                         }
@@ -35,7 +38,7 @@ export class Network {
                     });
                     totalError += errors.reduce((sum, err) => sum + err * err, 0) / errors.length;
                     
-                    let layerErrors = errors;
+                    layerErrors = errors;
                     for (let j = this.layers.length - 1; j >= 0; j--) {
                         console.log(`Before backpropagation - Layer ${j}, Errors:`, layerErrors);
                         if (layerErrors.some(err => !isValidNumber(err))) {
@@ -51,9 +54,9 @@ export class Network {
                     console.error(`Error in epoch ${epoch + 1}, input ${i}:`, error);
                     console.error('Current state:', { 
                         inputs: inputs[i], 
-                        output: output || 'undefined', 
-                        errors: errors || 'undefined', 
-                        layerErrors: layerErrors || 'undefined' 
+                        output: output, 
+                        errors: errors, 
+                        layerErrors: layerErrors 
                     });
                     return; // Stop training if an error occurs
                 }
