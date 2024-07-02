@@ -12,6 +12,7 @@ export class NeuralNetwork {
     private biasH: number[]; // Biases for hidden layer
     private biasO: number[]; // Biases for output layer
     private learningRate: number;
+    private clipValue: number; // Maximum allowed gradient value
 
     /**
      * Constructor for the NeuralNetwork class.
