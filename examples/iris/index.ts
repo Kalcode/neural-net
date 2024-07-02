@@ -1,5 +1,6 @@
 import { NeuralNetwork } from '../../src/NeuralNetwork';
-import { irisData, featuresToArray, classToArray, arrayToClass, IrisFeatures, IrisClass } from './iris_data';
+import { irisData, featuresToArray, classToArray, arrayToClass } from './iris_data';
+import type { IrisFeatures } from './iris_data';
 
 export function runIrisExample() {
     // Create and train the neural network
