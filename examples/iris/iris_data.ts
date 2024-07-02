@@ -8,12 +8,12 @@ export interface IrisFeatures {
 export type IrisClass = 'Iris-setosa' | 'Iris-versicolor' | 'Iris-virginica';
 
 export const irisData: Array<{ features: IrisFeatures; class: IrisClass }> = [
-    { features: { sepalLength: 5.1, sepalWidth: 3.5, petalLength: 1.4, petalWidth: 0.2 }, class: 'setosa' },
-    { features: { sepalLength: 4.9, sepalWidth: 3.0, petalLength: 1.4, petalWidth: 0.2 }, class: 'setosa' },
-    { features: { sepalLength: 7.0, sepalWidth: 3.2, petalLength: 4.7, petalWidth: 1.4 }, class: 'versicolor' },
-    { features: { sepalLength: 6.4, sepalWidth: 3.2, petalLength: 4.5, petalWidth: 1.5 }, class: 'versicolor' },
-    { features: { sepalLength: 6.3, sepalWidth: 3.3, petalLength: 6.0, petalWidth: 2.5 }, class: 'virginica' },
-    { features: { sepalLength: 5.8, sepalWidth: 2.7, petalLength: 5.1, petalWidth: 1.9 }, class: 'virginica' },
+    { features: { sepalLength: 5.1, sepalWidth: 3.5, petalLength: 1.4, petalWidth: 0.2 }, class: 'Iris-setosa' },
+    { features: { sepalLength: 4.9, sepalWidth: 3.0, petalLength: 1.4, petalWidth: 0.2 }, class: 'Iris-setosa' },
+    { features: { sepalLength: 7.0, sepalWidth: 3.2, petalLength: 4.7, petalWidth: 1.4 }, class: 'Iris-versicolor' },
+    { features: { sepalLength: 6.4, sepalWidth: 3.2, petalLength: 4.5, petalWidth: 1.5 }, class: 'Iris-versicolor' },
+    { features: { sepalLength: 6.3, sepalWidth: 3.3, petalLength: 6.0, petalWidth: 2.5 }, class: 'Iris-virginica' },
+    { features: { sepalLength: 5.8, sepalWidth: 2.7, petalLength: 5.1, petalWidth: 1.9 }, class: 'Iris-virginica' },
 ];
 
 export function featuresToArray(features: IrisFeatures): number[] {
@@ -34,9 +34,9 @@ export function classToArray(irisClass: IrisClass): number[] {
 export function arrayToClass(output: number[]): IrisClass {
     const maxIndex = output.indexOf(Math.max(...output));
     switch (maxIndex) {
-        case 0: return 'setosa';
-        case 1: return 'versicolor';
-        case 2: return 'virginica';
+        case 0: return 'Iris-setosa';
+        case 1: return 'Iris-versicolor';
+        case 2: return 'Iris-virginica';
         default: throw new Error('Invalid output array');
     }
 }
