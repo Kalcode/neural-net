@@ -19,7 +19,7 @@ export function runIrisExample() {
             const input = featuresToArray(data.features);
             const target = classToArray(data.class);
             if (input.length === 4 && target.length === 3) {
-                const { error } = nn.train(input, target);
+                const error = nn.train(input, target);
                 epochError += error;
             } else {
                 console.error(`Invalid input or target length for data point:`, data);
