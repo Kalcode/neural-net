@@ -19,7 +19,7 @@ async function downloadFile(url: string, outputPath: string): Promise<void> {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         if (!response.body) throw new Error('Response body is null');
         await pipeline(
-            Readable.fromWeb(response.body),
+            Readable.fromWeb(response.body as ReadableStream<Uint8Array>),
             createGunzip(),
             createWriteStream(outputPath)
         );
