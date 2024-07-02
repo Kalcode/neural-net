@@ -34,7 +34,32 @@ Note: The number of hidden nodes can be adjusted based on the complexity of the 
 
 ## Half Adder Example
 
-[... existing Half Adder explanation ...]
+The Half Adder is a digital circuit that performs addition of two binary digits. It produces two outputs: Sum and Carry.
+
+- Sum: The result of adding two bits (modulo 2)
+- Carry: The overflow bit when adding two bits
+
+
+Truth Table for Half Adder:
+- Input: 0, 0 -> Output: Sum = 0, Carry = 0
+- Input: 0, 1 -> Output: Sum = 1, Carry = 0
+- Input: 1, 0 -> Output: Sum = 1, Carry = 0
+- Input: 1, 1 -> Output: Sum = 0, Carry = 1
+
+```
+A | B | Sum | Carry
+0 | 0 |  0  |   0
+0 | 1 |  1  |   0
+1 | 0 |  1  |   0
+1 | 1 |  0  |   1
+```
+
+The neural network for the Half Adder problem has:
+- 2 input nodes (representing the two input bits)
+- 4 hidden nodes
+- 2 output nodes (representing Sum and Carry)
+
+This example demonstrates the network's ability to learn more complex logical operations with multiple outputs.
 
 ## Iris Classification Example
 
@@ -59,11 +84,43 @@ This example demonstrates the network's ability to learn a multi-class classific
 
 ## Key Components
 
-[... existing Key Components section ...]
+1. **Constructor**: Initializes the network structure, weights, and biases.
+2. **Forward Pass**: Computes the output of the network for a given input.
+3. **Backward Pass (Training)**: Updates weights and biases using backpropagation.
+4. **Activation Function**: Uses the sigmoid function and its derivative.
+5. **Error Calculation**: Employs Mean Squared Error (MSE) for loss computation.
 
 ## Detailed Breakdown
 
-[... existing Detailed Breakdown section ...]
+### 1. Network Initialization
+
+- The `constructor` initializes the network with specified number of input, hidden, and output nodes.
+- Weights are initialized randomly between -1 and 1 using `initializeWeights` method.
+- Biases are also initialized randomly between -1 and 1 using `initializeBias` method.
+
+### 2. Activation Function
+
+- The `sigmoid` function is used as the activation function: f(x) = 1 / (1 + e^(-x))
+- Its derivative, `sigmoidDerivative`, is used in backpropagation: f'(x) = f(x) * (1 - f(x))
+
+### 3. Forward Pass
+
+The `forward` method computes the output of the network:
+- Calculates the weighted sum of inputs plus bias for each hidden node.
+- Applies the sigmoid activation function to get the hidden layer output.
+- Repeats the process for the output layer, using the hidden layer's output as input.
+
+### 4. Backward Pass (Training)
+
+The `train` method implements the backpropagation algorithm:
+- Computes the output error (target - actual output).
+- Calculates the gradient for the output layer.
+- Propagates the error back to the hidden layer.
+- Updates weights and biases for both layers using the computed gradients and a learning rate.
+
+### 5. Error Calculation
+
+The `meanSquaredError` method calculates the average squared difference between predicted and target values.
 
 ## Training Process
 
