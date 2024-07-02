@@ -8,7 +8,7 @@ const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
 const outputFile = outputDir + '/iris.data';
 
-async function downloadAndExtract(url: string, outputPath: string): Promise<void> {
+async function downloadAndExtract(url: string, outputDir: string): Promise<void> {
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     if (!response.body) throw new Error('Response body is null');
