@@ -21,11 +21,11 @@ export class NeuralNetwork {
      * @param outputNodes Number of output nodes
      * @param learningRate Learning rate for weight updates (default: 0.1)
      */
-    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, learningRate: number = 0.01) {                                           
+    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, learningRate: number = 0.01) {
         // add contructor values to instance
-        this.inputNodes = inputNodes;                                                                                                                 
-        this.hiddenNodes = hiddenNodes;                                                                                                               
-        this.outputNodes = outputNodes;                                                                                                               
+        this.inputNodes = inputNodes;
+        this.hiddenNodes = hiddenNodes;
+        this.outputNodes = outputNodes;
         this.learningRate = learningRate;
         this.clipValue = 1.0; // Set a reasonable clip value
 
@@ -163,5 +163,27 @@ export class NeuralNetwork {
      */
     meanSquaredError(predictions: number[], targets: number[]): number {
         return predictions.reduce((sum, pred, i) => sum + Math.pow(targets[i] - pred, 2), 0) / predictions.length;
+    }
+
+    /**
+     * Print out what the neural network model data looks like
+     * @returns void
+     */
+    print() {
+        console.log('Neural Network Model:');
+        console.log(`- Input nodes: ${this.inputNodes}`);
+        console.log(`- Hidden nodes: ${this.hiddenNodes}`);
+        console.log(`- Output nodes: ${this.outputNodes}`);
+        console.log(`- Learning rate: ${this.learningRate}`);
+        console.log(`- Clip value: ${this.clipValue}`);
+        console.log('- Weights IH:');
+        console.table(this.weightsIH);
+        console.log('- Weights HO:');
+        console.table(this.weightsHO);
+        console.log('- Bias H:');
+        console.table(this.biasH);
+        console.log('- Bias O:');
+        console.table(this.biasO);
+
     }
 }

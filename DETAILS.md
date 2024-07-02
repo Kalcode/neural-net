@@ -122,6 +122,11 @@ The neural network for the Iris Classification problem has:
 
 This example demonstrates the network's ability to learn a multi-class classification problem with real-valued inputs.
 
+### Sample Output of the model's internal weights and biases
+Here is an image where I console logged the various data inside the Neural Network instance
+
+![image](images/sample_nn_output.png)
+
 ## Key Components
 
 1. **Constructor**: Initializes the network structure, weights, and biases.

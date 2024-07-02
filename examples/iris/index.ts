@@ -9,7 +9,7 @@ import * as path from 'path';
 
 export function runIrisExample() {
     const irisData = loadIrisData();
-    
+
     // Create and train the neural network
     const nn = new NeuralNetwork(4, 8, 3, 0.01); // Increased hidden nodes, lower learning rate
     const epochs = 20000; // Increased number of epochs
@@ -93,4 +93,7 @@ export function runIrisExample() {
             console.log(`Please open the HTML report manually: ${htmlFilePath}`);
             break;
     }
+
+    nn.print();
+
 }
