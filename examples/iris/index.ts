@@ -78,7 +78,19 @@ export function runIrisExample() {
 
     // Generate HTML report
     const htmlContent = generateHTML(confusionMatrix, metrics, learningCurve, accuracy);
-    const htmlFilePath = path.join(__dirname, 'iris_classification_results.html');
+
+    const htmlFilePath = path.join(__dirname, 'data', 'iris_classification_results.html');
     fs.writeFileSync(htmlFilePath, htmlContent);
     console.log(`\nHTML report generated: ${htmlFilePath}`);
+
+    // open file
+    const { exec } = require('child_process');
+    switch (process.platform) {
+        case 'darwin':
+            exec(`open ${htmlFilePath}`);
+            break;
+        default:
+            console.log(`Please open the HTML report manually: ${htmlFilePath}`);
+            break;
+    }
 }

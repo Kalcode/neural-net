@@ -1,4 +1,4 @@
-import { ConfusionMatrix } from './metrics';
+import type { ConfusionMatrix } from './metrics';
 
 export function generateHTML(
     confusionMatrix: ConfusionMatrix,

@@ -177,5 +177,8 @@ dist
 # AIDER!
 .aider*
 
+
+
 # Iris dataset
-examples/iris/data/
+examples/iris/data/*
+!examples/iris/data/.gitkeep
