@@ -1,10 +1,12 @@
+import { mkdir } from 'node:fs/promises';
+
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
 const zipFile = outputDir + '/iris.zip';
 const outputFile = outputDir + '/iris.data';
 
 // Create the output directory if it doesn't exist
-await Bun.mkdir(outputDir, { recursive: true });
+await mkdir(outputDir, { recursive: true });
 
 console.log('Downloading Iris dataset...');
 
