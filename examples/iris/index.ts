@@ -1,11 +1,14 @@
-import { NeuralNetwork } from '../../src/NeuralNetwork';
-import { featuresToArray, classToArray, arrayToClass } from './iris_data';
-import { loadIrisData } from './load_iris_data';
-import { createConfusionMatrix, calculateMetrics, printConfusionMatrix, printMetrics } from './metrics';
-import type { IrisFeatures, IrisClass } from './iris_data';
-import { generateHTML } from './html_generator';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import { NeuralNetwork } from '../../src/NeuralNetwork';
+
+import { createConfusionMatrix, calculateMetrics, printConfusionMatrix, printMetrics } from './metrics';
+import { featuresToArray, classToArray, arrayToClass } from './iris_data';
+import { generateHTML } from './html_generator';
+import { loadIrisData } from './load_iris_data';
+import type { IrisFeatures, IrisClass } from './iris_data';
+
 
 export function runIrisExample() {
     const irisData = loadIrisData();

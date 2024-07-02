@@ -1,10 +1,10 @@
-import { runXORExample } from '../examples/xor';
 import { runANDExample } from '../examples/and';
-import { runORExample } from '../examples/or';
-import { runNANDExample } from '../examples/nand';
 import { runHalfAdderExample } from '../examples/half-adder';
 import { runIrisExample } from '../examples/iris';
 import { runLargestExample } from '../examples/largest';
+import { runNANDExample } from '../examples/nand';
+import { runORExample } from '../examples/or';
+import { runXORExample } from '../examples/xor';
 
 console.log("Running XOR Example:");
 runXORExample();

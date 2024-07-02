@@ -1,7 +1,7 @@
+import { Extract } from 'unzipper';
 import { mkdir } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
-import { Extract } from 'unzipper';
 
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
