@@ -15,15 +15,22 @@ export function runIrisExample() {
         irisData.forEach(data => {
             const input = featuresToArray(data.features);
             const target = classToArray(data.class);
-            nn.train(input, target);
+            if (input.length === 4 && target.length === 3) {
+                nn.train(input, target);
+            } else {
+                console.error(`Invalid input or target length for data point:`, data);
+            }
         });
 
         if (i % 1000 === 0) {
             const mse = irisData.reduce((sum, data) => {
                 const input = featuresToArray(data.features);
                 const target = classToArray(data.class);
-                const { output } = nn.forward(input);
-                return sum + nn.meanSquaredError(output, target);
+                if (input.length === 4 && target.length === 3) {
+                    const { output } = nn.forward(input);
+                    return sum + nn.meanSquaredError(output, target);
+                }
+                return sum;
             }, 0) / irisData.length;
             console.log(`Epoch ${i}: MSE = ${mse}`);
         }

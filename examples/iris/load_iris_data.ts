@@ -9,13 +9,16 @@ interface IrisDataPoint {
 
 export function loadIrisData(): IrisDataPoint[] {
     const dataPath = path.join(__dirname, 'data', 'iris.data');
+    console.log(`Loading Iris data from: ${dataPath}`);
     const data = fs.readFileSync(dataPath, 'utf8');
     const lines = data.split('\n').filter(line => line.trim() !== '');
+    console.log(`Found ${lines.length} data points`);
 
-    return lines.map(line => {
+    const irisData = lines.map((line, index) => {
         const [sepalLength, sepalWidth, petalLength, petalWidth, className] = line.split(',');
         if (!sepalLength || !sepalWidth || !petalLength || !petalWidth || !className) {
-            throw new Error(`Invalid data line: ${line}`);
+            console.error(`Invalid data line at index ${index}: ${line}`);
+            return null;
         }
         return {
             features: {
@@ -26,5 +29,8 @@ export function loadIrisData(): IrisDataPoint[] {
             },
             class: className.trim() as IrisClass
         };
-    });
+    }).filter((dataPoint): dataPoint is IrisDataPoint => dataPoint !== null);
+
+    console.log(`Successfully loaded ${irisData.length} valid data points`);
+    return irisData;
 }
