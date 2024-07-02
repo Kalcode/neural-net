@@ -2,8 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { createWriteStream } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
-import { createGunzip } from 'node:zlib';
-import fetch from 'node-fetch';
+import { Extract } from 'unzipper';
 
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
@@ -16,8 +15,7 @@ async function downloadAndExtract(url: string, outputPath: string): Promise<void
 
     await pipeline(
         Readable.fromWeb(response.body as ReadableStream<Uint8Array>),
-        createGunzip(),
-        createWriteStream(outputPath)
+        Extract({ path: outputDir })
     );
 
     console.log('Iris dataset downloaded and extracted successfully!');
