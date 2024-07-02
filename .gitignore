@@ -176,3 +176,6 @@ dist
 
 # AIDER!
 .aider*
+
+# Iris dataset
+examples/iris/data/
