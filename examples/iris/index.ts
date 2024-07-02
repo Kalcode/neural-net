@@ -3,6 +3,9 @@ import { featuresToArray, classToArray, arrayToClass } from './iris_data';
 import { loadIrisData } from './load_iris_data';
 import { createConfusionMatrix, calculateMetrics, printConfusionMatrix, printMetrics } from './metrics';
 import type { IrisFeatures, IrisClass } from './iris_data';
+import { generateHTML } from './html_generator';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export function runIrisExample() {
     const irisData = loadIrisData();
@@ -72,4 +75,10 @@ export function runIrisExample() {
     console.log(`Input: ${JSON.stringify(newIris)}`);
     console.log(`Predicted class: ${predictedClass}`);
     console.log(`Raw output: [${output.map(v => v.toFixed(4))}]`);
+
+    // Generate HTML report
+    const htmlContent = generateHTML(confusionMatrix, metrics, learningCurve, accuracy);
+    const htmlFilePath = path.join(__dirname, 'iris_classification_results.html');
+    fs.writeFileSync(htmlFilePath, htmlContent);
+    console.log(`\nHTML report generated: ${htmlFilePath}`);
 }
