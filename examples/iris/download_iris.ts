@@ -24,7 +24,7 @@ async function downloadAndExtract(url: string, outputPath: string): Promise<void
 async function main() {
     try {
         await mkdir(outputDir, { recursive: true });
-        await downloadAndExtract(url, outputFile);
+        await downloadAndExtract(url, outputDir);
     } catch (error) {
         console.error('Error processing Iris dataset:', error);
         process.exit(1);
