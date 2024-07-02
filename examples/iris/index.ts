@@ -1,8 +1,11 @@
 import { NeuralNetwork } from '../../src/NeuralNetwork';
-import { irisData, featuresToArray, classToArray, arrayToClass } from './iris_data';
+import { featuresToArray, classToArray, arrayToClass } from './iris_data';
+import { loadIrisData } from './load_iris_data';
 import type { IrisFeatures } from './iris_data';
 
 export function runIrisExample() {
+    const irisData = loadIrisData();
+    
     // Create and train the neural network
     const nn = new NeuralNetwork(4, 5, 3);
     const epochs = 10000;
@@ -23,13 +26,21 @@ export function runIrisExample() {
     }
 
     console.log("\nTraining complete. Testing the trained network:");
+    let correctPredictions = 0;
     irisData.forEach(data => {
         const { output } = nn.forward(featuresToArray(data.features));
         const predictedClass = arrayToClass(output);
         console.log(`Input: ${JSON.stringify(data.features)}`);
         console.log(`Predicted: ${predictedClass}, Actual: ${data.class}`);
         console.log(`Raw output: [${output.map(v => v.toFixed(4))}]\n`);
+        
+        if (predictedClass === data.class) {
+            correctPredictions++;
+        }
     });
+
+    const accuracy = (correctPredictions / irisData.length) * 100;
+    console.log(`\nAccuracy: ${accuracy.toFixed(2)}%`);
 
     // Example of using the trained network with user input
     console.log("\nTry classifying a new Iris flower:");
