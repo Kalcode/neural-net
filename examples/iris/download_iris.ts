@@ -2,7 +2,6 @@ import { mkdir } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
 import { Extract } from 'unzipper';
-import fetch from 'node-fetch';
 
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
@@ -14,7 +13,7 @@ async function downloadAndExtract(url: string, outputDir: string): Promise<void>
     if (!response.body) throw new Error('Response body is null');
 
     await pipeline(
-        Readable.fromWeb(response.body as ReadableStream<Uint8Array>),
+        Readable.fromWeb(response.body as any),
         Extract({ path: outputDir })
     );
 
