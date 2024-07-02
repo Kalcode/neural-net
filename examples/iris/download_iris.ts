@@ -2,7 +2,6 @@ import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import { createGunzip } from 'node:zlib';
 import { pipeline } from 'node:stream/promises';
 import { createWriteStream } from 'node:fs';
-import fetch from 'node-fetch';
 
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
