@@ -3,7 +3,8 @@
   "type": "module",
   "module": "src/index.ts",
   "scripts": {
-    "start": "bun run src/index.ts"
+    "start": "bun run src/index.ts",
+    "download-iris": "bun run examples/iris/download_iris.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.1.6",
