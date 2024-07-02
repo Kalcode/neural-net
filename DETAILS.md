@@ -20,11 +20,11 @@ The implementation consists of a `NeuralNetwork` class that creates a feedforwar
 
 - Input layer: 
   - 2 nodes for XOR, AND, OR, NAND, and Half Adder
-  - 3 nodes for Iris Classification
+  - 4 nodes for Iris Classification
 - Hidden layer: 
   - 4 nodes for XOR and Half Adder
   - 3 nodes for AND, OR, and NAND
-  - 5 nodes for Iris Classification
+  - 8 nodes for Iris Classification
 - Output layer: 
   - 1 node for XOR, AND, OR, and NAND
   - 2 nodes for Half Adder
@@ -32,7 +32,7 @@ The implementation consists of a `NeuralNetwork` class that creates a feedforwar
 
 Note: The number of hidden nodes can be adjusted based on the complexity of the problem.
 
-### XOR Problem
+## XOR Problem
 
 The XOR (exclusive OR) problem is a classic example used to demonstrate the capability of neural networks. The XOR function takes two binary inputs and returns 1 if exactly one of the inputs is 1, and 0 otherwise. The truth table for XOR is:
 
@@ -45,7 +45,38 @@ The XOR (exclusive OR) problem is a classic example used to demonstrate the capa
 
 A single-layer perceptron cannot learn the XOR function, as it is not linearly separable. However, a multi-layer perceptron (MLP) with at least one hidden layer can learn to approximate the XOR function.
 
-In this project, we train an MLP to solve the XOR problem and observe its learning progress.
+## AND Problem
+
+The AND problem is a simple logical operation where the output is 1 only if both inputs are 1. Unlike XOR, it is linearly separable and can be learned by a single-layer perceptron. The truth table for AND is:
+
+| Input 1 | Input 2 | Output |
+|---------|---------|--------|
+|    0    |    0    |    0   |
+|    0    |    1    |    0   |
+|    1    |    0    |    0   |
+|    1    |    1    |    1   |
+
+## OR Problem
+
+The OR problem is another simple logical operation where the output is 1 if at least one of the inputs is 1. Like AND, it is linearly separable. The truth table for OR is:
+
+| Input 1 | Input 2 | Output |
+|---------|---------|--------|
+|    0    |    0    |    0   |
+|    0    |    1    |    1   |
+|    1    |    0    |    1   |
+|    1    |    1    |    1   |
+
+## NAND Problem
+
+The NAND (NOT AND) problem is the negation of the AND operation. The output is 0 only if both inputs are 1. It is also linearly separable. The truth table for NAND is:
+
+| Input 1 | Input 2 | Output |
+|---------|---------|--------|
+|    0    |    0    |    1   |
+|    0    |    1    |    1   |
+|    1    |    0    |    1   |
+|    1    |    1    |    0   |
 
 ## Half Adder Example
 
@@ -54,20 +85,13 @@ The Half Adder is a digital circuit that performs addition of two binary digits.
 - Sum: The result of adding two bits (modulo 2)
 - Carry: The overflow bit when adding two bits
 
-
 Truth Table for Half Adder:
-- Input: 0, 0 -> Output: Sum = 0, Carry = 0
-- Input: 0, 1 -> Output: Sum = 1, Carry = 0
-- Input: 1, 0 -> Output: Sum = 1, Carry = 0
-- Input: 1, 1 -> Output: Sum = 0, Carry = 1
-
-```
-A | B | Sum | Carry
-0 | 0 |  0  |   0
-0 | 1 |  1  |   0
-1 | 0 |  1  |   0
-1 | 1 |  0  |   1
-```
+| Input 1 | Input 2 | Sum | Carry |
+|---------|---------|-----|-------|
+|    0    |    0    |  0  |   0   |
+|    0    |    1    |  1  |   0   |
+|    1    |    0    |  1  |   0   |
+|    1    |    1    |  0  |   1   |
 
 The neural network for the Half Adder problem has:
 - 2 input nodes (representing the two input bits)
@@ -77,9 +101,10 @@ The neural network for the Half Adder problem has:
 This example demonstrates the network's ability to learn more complex logical operations with multiple outputs.
 
 ## Iris Classification Example
+
 The Iris classification problem is a well-known dataset in the machine learning community. It involves classifying iris flowers into three species based on four features: sepal length, sepal width, petal length, and petal width. This example demonstrates how our neural network can handle multi-class classification tasks with real-world data.
 
-In our simplified version, we use three features:
+We use all four features:
 1. Sepal length
 2. Sepal width
 3. Petal length
@@ -139,9 +164,9 @@ The `meanSquaredError` method calculates the average squared difference between 
 
 ## Training Process
 
-- The network is trained for 10,000 epochs in all examples.
+- The network is trained for a specified number of epochs in all examples (typically 10,000 or more).
 - In each epoch, it trains on all input-output pairs for the respective problem.
-- The Mean Squared Error is calculated and logged every 1000 epochs to track progress.
+- The Mean Squared Error is calculated and logged periodically to track progress.
 
 ## Testing
 
