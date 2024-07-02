@@ -32,6 +32,21 @@ The implementation consists of a `NeuralNetwork` class that creates a feedforwar
 
 Note: The number of hidden nodes can be adjusted based on the complexity of the problem.
 
+### XOR Problem
+
+The XOR (exclusive OR) problem is a classic example used to demonstrate the capability of neural networks. The XOR function takes two binary inputs and returns 1 if exactly one of the inputs is 1, and 0 otherwise. The truth table for XOR is:
+
+| Input 1 | Input 2 | Output |
+|---------|---------|--------|
+|    0    |    0    |    0   |
+|    0    |    1    |    1   |
+|    1    |    0    |    1   |
+|    1    |    1    |    0   |
+
+A single-layer perceptron cannot learn the XOR function, as it is not linearly separable. However, a multi-layer perceptron (MLP) with at least one hidden layer can learn to approximate the XOR function.
+
+In this project, we train an MLP to solve the XOR problem and observe its learning progress.
+
 ## Half Adder Example
 
 The Half Adder is a digital circuit that performs addition of two binary digits. It produces two outputs: Sum and Carry.
@@ -62,13 +77,13 @@ The neural network for the Half Adder problem has:
 This example demonstrates the network's ability to learn more complex logical operations with multiple outputs.
 
 ## Iris Classification Example
-
-The Iris dataset is a classic machine learning problem. It involves classifying iris flowers into three species based on their sepal and petal measurements.
+The Iris classification problem is a well-known dataset in the machine learning community. It involves classifying iris flowers into three species based on four features: sepal length, sepal width, petal length, and petal width. This example demonstrates how our neural network can handle multi-class classification tasks with real-world data.
 
 In our simplified version, we use three features:
 1. Sepal length
 2. Sepal width
 3. Petal length
+4. Petal width
 
 We classify the flowers into three species:
 1. Setosa
@@ -76,8 +91,8 @@ We classify the flowers into three species:
 3. Virginica
 
 The neural network for the Iris Classification problem has:
-- 3 input nodes (representing the three features)
-- 5 hidden nodes
+- 4 input nodes (representing the four features)
+- 8 hidden nodes
 - 3 output nodes (representing the three species)
 
 This example demonstrates the network's ability to learn a multi-class classification problem with real-valued inputs.

@@ -37,25 +37,6 @@ This project includes several examples to demonstrate the capabilities of our ne
 
 Each of these examples showcases different aspects of neural network learning and application.
 
-### XOR Problem
-
-The XOR (exclusive OR) problem is a classic example used to demonstrate the capability of neural networks. The XOR function takes two binary inputs and returns 1 if exactly one of the inputs is 1, and 0 otherwise. The truth table for XOR is:
-
-| Input 1 | Input 2 | Output |
-|---------|---------|--------|
-|    0    |    0    |    0   |
-|    0    |    1    |    1   |
-|    1    |    0    |    1   |
-|    1    |    1    |    0   |
-
-A single-layer perceptron cannot learn the XOR function, as it is not linearly separable. However, a multi-layer perceptron (MLP) with at least one hidden layer can learn to approximate the XOR function.
-
-In this project, we train an MLP to solve the XOR problem and observe its learning progress.
-
-### Iris Classification
-
-The Iris classification problem is a well-known dataset in the machine learning community. It involves classifying iris flowers into three species based on four features: sepal length, sepal width, petal length, and petal width. This example demonstrates how our neural network can handle multi-class classification tasks with real-world data.
-
 ## Prerequisites
 
 - [Bun](https://bun.sh/) installed on your system
