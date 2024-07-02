@@ -1,6 +1,3 @@
-import { unzip } from 'zlib';
-import { promisify } from 'util';
-
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
 const zipFile = outputDir + '/iris.zip';
@@ -18,8 +15,9 @@ async function downloadFile(url: string, outputPath: string): Promise<void> {
 
 async function unzipFile(zipPath: string, outputPath: string): Promise<void> {
     const zipContent = await Bun.file(zipPath).arrayBuffer();
-    const unzipped = await promisify(unzip)(Buffer.from(zipContent));
-    await Bun.write(outputPath, unzipped);
+    const compressed = new Uint8Array(zipContent);
+    const decompressed = Bun.gunzipSync(compressed);
+    await Bun.write(outputPath, decompressed);
 }
 
 async function cleanupFile(filePath: string): Promise<void> {
