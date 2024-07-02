@@ -13,13 +13,17 @@ export function runIrisExample() {
     console.log("Training the neural network for Iris classification...");
     for (let i = 0; i < epochs; i++) {
         irisData.forEach(data => {
-            nn.train(featuresToArray(data.features), classToArray(data.class));
+            const input = featuresToArray(data.features);
+            const target = classToArray(data.class);
+            nn.train(input, target);
         });
 
         if (i % 1000 === 0) {
             const mse = irisData.reduce((sum, data) => {
-                const { output } = nn.forward(featuresToArray(data.features));
-                return sum + nn.meanSquaredError(output, classToArray(data.class));
+                const input = featuresToArray(data.features);
+                const target = classToArray(data.class);
+                const { output } = nn.forward(input);
+                return sum + nn.meanSquaredError(output, target);
             }, 0) / irisData.length;
             console.log(`Epoch ${i}: MSE = ${mse}`);
         }

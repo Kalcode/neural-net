@@ -14,6 +14,9 @@ export function loadIrisData(): IrisDataPoint[] {
 
     return lines.map(line => {
         const [sepalLength, sepalWidth, petalLength, petalWidth, className] = line.split(',');
+        if (!sepalLength || !sepalWidth || !petalLength || !petalWidth || !className) {
+            throw new Error(`Invalid data line: ${line}`);
+        }
         return {
             features: {
                 sepalLength: parseFloat(sepalLength),
