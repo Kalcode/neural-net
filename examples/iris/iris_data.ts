@@ -5,7 +5,7 @@ export interface IrisFeatures {
     petalWidth: number;
 }
 
-export type IrisClass = 'setosa' | 'versicolor' | 'virginica';
+export type IrisClass = 'Iris-setosa' | 'Iris-versicolor' | 'Iris-virginica';
 
 export const irisData: Array<{ features: IrisFeatures; class: IrisClass }> = [
     { features: { sepalLength: 5.1, sepalWidth: 3.5, petalLength: 1.4, petalWidth: 0.2 }, class: 'setosa' },
@@ -22,9 +22,12 @@ export function featuresToArray(features: IrisFeatures): number[] {
 
 export function classToArray(irisClass: IrisClass): number[] {
     switch (irisClass) {
-        case 'setosa': return [1, 0, 0];
-        case 'versicolor': return [0, 1, 0];
-        case 'virginica': return [0, 0, 1];
+        case 'Iris-setosa': return [1, 0, 0];
+        case 'Iris-versicolor': return [0, 1, 0];
+        case 'Iris-virginica': return [0, 0, 1];
+        default:
+            console.error(`Invalid iris class: ${irisClass}`);
+            return [0, 0, 0];
     }
 }
 
