@@ -2,6 +2,7 @@ import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import { createGunzip } from 'node:zlib';
 import { pipeline } from 'node:stream/promises';
 import { createWriteStream } from 'node:fs';
+import { Readable } from 'node:stream';
 
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
@@ -18,7 +19,7 @@ async function downloadFile(url: string, outputPath: string): Promise<void> {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         if (!response.body) throw new Error('Response body is null');
         await pipeline(
-            response.body,
+            Readable.fromWeb(response.body),
             createGunzip(),
             createWriteStream(outputPath)
         );
