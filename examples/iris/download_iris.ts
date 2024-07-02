@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, unlink } from 'node:fs/promises';
 
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
@@ -24,7 +24,7 @@ async function unzipFile(zipPath: string, outputPath: string): Promise<void> {
 
 async function cleanupFile(filePath: string): Promise<void> {
     try {
-        await Bun.file(filePath).remove();
+        await unlink(filePath);
     } catch (err) {
         console.warn(`Failed to delete file ${filePath}:`, err);
     }
