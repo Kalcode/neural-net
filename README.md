@@ -49,7 +49,11 @@ Each of these examples showcases different aspects of neural network learning an
    ```
    bun install
    ```
-3. Run the project:
+3. Download Iris dataset:
+   ```
+   bun run download-iris
+   ```
+4. Run the project:
    ```
    bun run start
    ```
