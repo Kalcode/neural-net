@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { IrisFeatures, IrisClass } from './iris_data';
+import type { IrisFeatures, IrisClass } from './iris_data';
 
 interface IrisDataPoint {
     features: IrisFeatures;
