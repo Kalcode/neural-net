@@ -4,7 +4,6 @@ import * as path from 'path';
 import * as zlib from 'zlib';
 import * as stream from 'stream';
 import * as util from 'util';
-import * as zlib from 'zlib';
 
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = path.join(__dirname, 'data');
@@ -20,33 +19,43 @@ console.log('Downloading Iris dataset...');
 
 const pipeline = util.promisify(stream.pipeline);
 
-async function downloadAndUnzip() {
+async function downloadFile(url: string, outputPath: string): Promise<void> {
+    const response = await new Promise<https.IncomingMessage>((resolve, reject) => {
+        https.get(url, resolve).on('error', reject);
+    });
+    await pipeline(response, fs.createWriteStream(outputPath));
+}
+
+async function unzipFile(zipPath: string, outputPath: string): Promise<void> {
+    const zipContent = await fs.promises.readFile(zipPath);
+    const unzipped = await util.promisify(zlib.unzip)(zipContent);
+    await fs.promises.writeFile(outputPath, unzipped);
+}
+
+async function cleanupFile(filePath: string): Promise<void> {
     try {
-        const response = await new Promise((resolve, reject) => {
-            https.get(url, resolve).on('error', reject);
-        });
-
-        await pipeline(response, fs.createWriteStream(zipFile));
-
-        console.log('Download completed. Unzipping...');
-
-        const zipContent = await fs.promises.readFile(zipFile);
-        const unzipped = await new Promise((resolve, reject) => {
-            zlib.unzip(zipContent, (err, buffer) => {
-                if (err) reject(err);
-                else resolve(buffer);
-            });
-        });
-
-        await fs.promises.writeFile(outputFile, unzipped);
-
-        console.log(`Iris dataset saved to: ${outputFile}`);
-
-        // Clean up the zip file
-        await fs.promises.unlink(zipFile);
+        await fs.promises.unlink(filePath);
     } catch (err) {
-        console.error('Error downloading or unzipping the file:', err);
+        console.warn(`Failed to delete file ${filePath}:`, err);
     }
 }
 
-downloadAndUnzip();
+async function downloadAndUnzip() {
+    try {
+        await downloadFile(url, zipFile);
+        console.log('Download completed. Unzipping...');
+
+        await unzipFile(zipFile, outputFile);
+        console.log(`Iris dataset saved to: ${outputFile}`);
+
+        await cleanupFile(zipFile);
+    } catch (err) {
+        console.error('Error downloading or unzipping the file:', err);
+        throw err;
+    }
+}
+
+downloadAndUnzip().catch(err => {
+    console.error('Failed to download and unzip Iris dataset:', err);
+    process.exit(1);
+});
