@@ -1,8 +1,11 @@
-import { mkdir, unlink } from 'node:fs/promises';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
+import { createGunzip } from 'node:zlib';
+import { pipeline } from 'node:stream/promises';
+import { createWriteStream } from 'node:fs';
+import fetch from 'node-fetch';
 
 const url = 'https://archive.ics.uci.edu/static/public/53/iris.zip';
 const outputDir = import.meta.dir + '/data';
-const zipFile = outputDir + '/iris.zip';
 const outputFile = outputDir + '/iris.data';
 
 // Create the output directory if it doesn't exist
@@ -11,15 +14,19 @@ await mkdir(outputDir, { recursive: true });
 console.log('Downloading Iris dataset...');
 
 async function downloadFile(url: string, outputPath: string): Promise<void> {
-    const response = await fetch(url);
-    await Bun.write(outputPath, response);
-}
-
-async function unzipFile(zipPath: string, outputPath: string): Promise<void> {
-    const zipContent = await Bun.file(zipPath).arrayBuffer();
-    const compressed = new Uint8Array(zipContent);
-    const decompressed = Bun.gunzipSync(compressed);
-    await Bun.write(outputPath, decompressed);
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.body) throw new Error('Response body is null');
+        await pipeline(
+            response.body,
+            createGunzip(),
+            createWriteStream(outputPath)
+        );
+    } catch (error) {
+        console.error(`Error downloading and extracting file from ${url} to ${outputPath}:`, error);
+        throw error;
+    }
 }
 
 async function cleanupFile(filePath: string): Promise<void> {
@@ -30,22 +37,15 @@ async function cleanupFile(filePath: string): Promise<void> {
     }
 }
 
-async function downloadAndUnzip() {
+async function main() {
     try {
-        await downloadFile(url, zipFile);
-        console.log('Download completed. Unzipping...');
-
-        await unzipFile(zipFile, outputFile);
-        console.log(`Iris dataset saved to: ${outputFile}`);
-
-        await cleanupFile(zipFile);
-    } catch (err) {
-        console.error('Error downloading or unzipping the file:', err);
-        throw err;
+        await mkdir(outputDir, { recursive: true });
+        await downloadFile(url, outputFile);
+        console.log('Iris dataset downloaded and extracted successfully!');
+    } catch (error) {
+        console.error('Error processing Iris dataset:', error);
+        process.exit(1);
     }
 }
 
-await downloadAndUnzip().catch(err => {
-    console.error('Failed to download and unzip Iris dataset:', err);
-    process.exit(1);
-});
+await main();
