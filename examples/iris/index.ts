@@ -8,8 +8,8 @@ export function runIrisExample() {
     const irisData = loadIrisData();
     
     // Create and train the neural network
-    const nn = new NeuralNetwork(4, 5, 3);
-    const epochs = 10000;
+    const nn = new NeuralNetwork(4, 8, 3, 0.01); // Increased hidden nodes, lower learning rate
+    const epochs = 20000; // Increased number of epochs
     const learningCurve: number[] = [];
 
     console.log("Training the neural network for Iris classification...");
@@ -30,7 +30,7 @@ export function runIrisExample() {
         learningCurve.push(mse);
 
         if (i % 1000 === 0) {
-            console.log(`Epoch ${i}: MSE = ${mse}`);
+            console.log(`Epoch ${i}: MSE = ${mse.toFixed(6)}`);
         }
     }
 

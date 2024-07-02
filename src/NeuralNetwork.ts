@@ -21,18 +21,23 @@ export class NeuralNetwork {
      * @param outputNodes Number of output nodes
      * @param learningRate Learning rate for weight updates (default: 0.1)
      */
-    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, learningRate: number = 0.1) {                                           
+    constructor(inputNodes: number, hiddenNodes: number, outputNodes: number, learningRate: number = 0.01) {                                           
         // add contructor values to instance
         this.inputNodes = inputNodes;                                                                                                                 
         this.hiddenNodes = hiddenNodes;                                                                                                               
         this.outputNodes = outputNodes;                                                                                                               
         this.learningRate = learningRate;
+        this.clipValue = 1.0; // Set a reasonable clip value
 
         // Initialize weights and biases with random values
         this.weightsIH = this.initializeWeights(this.hiddenNodes, this.inputNodes);
         this.weightsHO = this.initializeWeights(this.outputNodes, this.hiddenNodes);
         this.biasH = this.initializeBias(this.hiddenNodes);
         this.biasO = this.initializeBias(this.outputNodes);
+    }
+
+    private clipGradients(gradients: number[][]): number[][] {
+        return gradients.map(row => row.map(grad => Math.max(Math.min(grad, this.clipValue), -this.clipValue)));
     }
 
     /**
@@ -106,20 +111,11 @@ export class NeuralNetwork {
      * @param input Input values
      * @param target Target output values
      */
-    train(input: number[], target: number[]): void {
+    train(input: number[], target: number[]): number {
         const { hidden, output } = this.forward(input);
 
         // Calculate output layer errors
         const outputErrors = output.map((out, i) => target[i] - out);
-
-        // Update weights and biases for the output layer
-        this.weightsHO.forEach((weights, i) => {
-            weights.forEach((_, j) => {
-                const delta = outputErrors[i] * this.sigmoidDerivative(output[i]) * hidden[j];
-                this.weightsHO[i][j] += this.learningRate * delta;
-            });
-            this.biasO[i] += this.learningRate * outputErrors[i] * this.sigmoidDerivative(output[i]);
-        });
 
         // Calculate hidden layer errors
         const hiddenErrors = this.weightsHO.reduce((errors, weights, i) => {
@@ -129,14 +125,34 @@ export class NeuralNetwork {
             return errors;
         }, new Array(this.hiddenNodes).fill(0));
 
+        // Calculate gradients
+        const outputGradients = outputErrors.map((error, i) => error * this.sigmoidDerivative(output[i]));
+        const hiddenGradients = hiddenErrors.map((error, i) => error * this.sigmoidDerivative(hidden[i]));
+
+        // Clip gradients
+        const clippedOutputGradients = this.clipGradients([outputGradients])[0];
+        const clippedHiddenGradients = this.clipGradients([hiddenGradients])[0];
+
+        // Update weights and biases for the output layer
+        this.weightsHO.forEach((weights, i) => {
+            weights.forEach((_, j) => {
+                const delta = clippedOutputGradients[i] * hidden[j];
+                this.weightsHO[i][j] += this.learningRate * delta;
+            });
+            this.biasO[i] += this.learningRate * clippedOutputGradients[i];
+        });
+
         // Update weights and biases for the hidden layer
         this.weightsIH.forEach((weights, i) => {
             weights.forEach((_, j) => {
-                const delta = hiddenErrors[i] * this.sigmoidDerivative(hidden[i]) * input[j];
+                const delta = clippedHiddenGradients[i] * input[j];
                 this.weightsIH[i][j] += this.learningRate * delta;
             });
-            this.biasH[i] += this.learningRate * hiddenErrors[i] * this.sigmoidDerivative(hidden[i]);
+            this.biasH[i] += this.learningRate * clippedHiddenGradients[i];
         });
+
+        // Calculate and return the mean squared error
+        return outputErrors.reduce((sum, error) => sum + error * error, 0) / outputErrors.length;
     }
 
     /**
